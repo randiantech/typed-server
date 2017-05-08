@@ -31,6 +31,10 @@ export default class Profile extends Resource<Profile> {
         return Profile.validate(obj)
     }
 
+    /**
+     * Validates whether or not supplied object contains valid parameters to contruct a Profile instance
+     * @param obj object to be validated
+     */
     validate(obj: any) {
         try {
             PersonalInfo.validate(obj.personalInfo)
@@ -43,6 +47,10 @@ export default class Profile extends Resource<Profile> {
         return []
     }
 
+    /**
+     * Given the name of a property, returns its database type
+     * @param propertyName the name of the property to which type will be resolved 
+     */
     static getPropertyType(propertyName: string): string {
         if(propertyName.startsWith('personalInfo')){
             propertyName = propertyName.split('.')[0]

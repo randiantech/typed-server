@@ -17,15 +17,24 @@ const app = express()
  */
 export default class Application {
 
-    public static DEFAULT_PORT = 3000;
+    public static DEFAULT_PORT = 3000
+    public static DEFAULT_PAGE = 1
+    public static DEFAULT_PAGE_SIZE = 50
+    static API_VERSION
+    static HOST
     services: any[]
 
-    constructor(services: any[], port?: number) {
+    constructor(services: any[], port?: number, version?:number, host?:string) {
+        version ? Application.API_VERSION = version : 'v1'
+        host ? Application.HOST = host : ''
+        
         app.use(logger('dev'));
         app.use(bodyParser.json());
         app.use(bodyParser.urlencoded({ extended: false }));
         app.use(cookieParser());
-
+        
+        app.use(this.injectPaginationParams)
+        
         app.use(RouterFactory.getRouter());
         app.set('port', port || Application.DEFAULT_PORT);
 
@@ -40,6 +49,12 @@ export default class Application {
         services.forEach((service) => {
             _services[service.getName()] = service
         })
+    }
+
+    injectPaginationParams(req, res, next) {
+        !req.query['page_size'] ? req.query['page_size'] = Application.DEFAULT_PAGE_SIZE : ''
+        !req.query['page'] ? req.query['page'] = Application.DEFAULT_PAGE : ''
+        return next()
     }
 
     public static getServiceByName(name:string){

@@ -8,19 +8,19 @@ const router = express.Router()
  */
 export default class RouterFactory {
 
-    public static create(method: Method, url: string, handler: any) {
+    public static create(method: Method, urls: string[] | string, handler: any) {
         switch (method) {
             case Method.GET:
-                router.get(url, handler);
+                router.get(urls, handler);
                 break;
             case Method.POST:
-                router.post(url, handler);
+                router.post(urls, handler);
                 break
             case Method.PUT:
-                router.put(url, handler);
+                router.put(urls, handler);
                 break
             case Method.DELETE:
-                router.delete(url, handler);
+                router.delete(urls, handler);
                 break
         }
     }

@@ -45,7 +45,7 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 	__webpack_require__(1);
-	module.exports = __webpack_require__(32);
+	module.exports = __webpack_require__(33);
 
 
 /***/ }),
@@ -56,9 +56,11 @@
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Application_1 = __webpack_require__(2);
 	var ProfileService_1 = __webpack_require__(10);
-	var MessageService_1 = __webpack_require__(28);
+	var MessageService_1 = __webpack_require__(29);
 	var port = process.env.APP_PORT;
-	new Application_1.default([new ProfileService_1.default(), new MessageService_1.default()], port);
+	var apiVersion = 2;
+	var host = 'http://myApiHost.com/';
+	new Application_1.default([new ProfileService_1.default(), new MessageService_1.default()], port, apiVersion, host);
 
 
 /***/ }),
@@ -80,11 +82,14 @@
 	 * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
 	 */
 	var Application = (function () {
-	    function Application(services, port) {
+	    function Application(services, port, version, host) {
+	        version ? Application.API_VERSION = version : 'v1';
+	        host ? Application.HOST = host : '';
 	        app.use(logger('dev'));
 	        app.use(bodyParser.json());
 	        app.use(bodyParser.urlencoded({ extended: false }));
 	        app.use(cookieParser());
+	        app.use(this.injectPaginationParams);
 	        app.use(RouterFactory_1.default.getRouter());
 	        app.set('port', port || Application.DEFAULT_PORT);
 	        var server = http.createServer(app);
@@ -97,12 +102,19 @@
 	            _services[service.getName()] = service;
 	        });
 	    }
+	    Application.prototype.injectPaginationParams = function (req, res, next) {
+	        !req.query['page_size'] ? req.query['page_size'] = Application.DEFAULT_PAGE_SIZE : '';
+	        !req.query['page'] ? req.query['page'] = Application.DEFAULT_PAGE : '';
+	        return next();
+	    };
 	    Application.getServiceByName = function (name) {
 	        return _services[name];
 	    };
 	    return Application;
 	}());
 	Application.DEFAULT_PORT = 3000;
+	Application.DEFAULT_PAGE = 1;
+	Application.DEFAULT_PAGE_SIZE = 50;
 	exports.default = Application;
 
 
@@ -152,19 +164,19 @@
 	var RouterFactory = (function () {
 	    function RouterFactory() {
 	    }
-	    RouterFactory.create = function (method, url, handler) {
+	    RouterFactory.create = function (method, urls, handler) {
 	        switch (method) {
 	            case Method_1.default.GET:
-	                router.get(url, handler);
+	                router.get(urls, handler);
 	                break;
 	            case Method_1.default.POST:
-	                router.post(url, handler);
+	                router.post(urls, handler);
 	                break;
 	            case Method_1.default.PUT:
-	                router.put(url, handler);
+	                router.put(urls, handler);
 	                break;
 	            case Method_1.default.DELETE:
-	                router.delete(url, handler);
+	                router.delete(urls, handler);
 	                break;
 	        }
 	    };
@@ -255,10 +267,9 @@
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Profile_1 = __webpack_require__(11);
-	var PostgreRepository_1 = __webpack_require__(16);
+	var PostgreRepository_1 = __webpack_require__(17);
 	var Method_1 = __webpack_require__(9);
-	var Log_1 = __webpack_require__(26);
-	var route_1 = __webpack_require__(27);
+	var route_1 = __webpack_require__(28);
 	var __this;
 	var ProfileService = (function (_super) {
 	    __extends(ProfileService, _super);
@@ -284,7 +295,7 @@
 	                        return [3 /*break*/, 4];
 	                    case 3:
 	                        err_1 = _a.sent();
-	                        res.send(Log_1.default(err_1));
+	                        res.send(err_1);
 	                        return [3 /*break*/, 4];
 	                    case 4: return [2 /*return*/];
 	                }
@@ -331,7 +342,7 @@
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Resource_1 = __webpack_require__(12);
-	var PersonalInfo_1 = __webpack_require__(15);
+	var PersonalInfo_1 = __webpack_require__(16);
 	var AppLogEntry_1 = __webpack_require__(13);
 	var AppLogType_1 = __webpack_require__(14);
 	var Profile = (function (_super) {
@@ -355,6 +366,10 @@
 	    Profile.validate = function (obj) {
 	        return Profile.validate(obj);
 	    };
+	    /**
+	     * Validates whether or not supplied object contains valid parameters to contruct a Profile instance
+	     * @param obj object to be validated
+	     */
 	    Profile.prototype.validate = function (obj) {
 	        try {
 	            PersonalInfo_1.default.validate(obj.personalInfo);
@@ -366,6 +381,10 @@
 	    Profile.prototype.embeddeds = function () {
 	        return [];
 	    };
+	    /**
+	     * Given the name of a property, returns its database type
+	     * @param propertyName the name of the property to which type will be resolved
+	     */
 	    Profile.getPropertyType = function (propertyName) {
 	        if (propertyName.startsWith('personalInfo')) {
 	            propertyName = propertyName.split('.')[0];
@@ -422,6 +441,7 @@
 	var AppLogEntry_1 = __webpack_require__(13);
 	var AppLogType_1 = __webpack_require__(14);
 	var Application_1 = __webpack_require__(2);
+	var utils_1 = __webpack_require__(15);
 	var Resource = (function () {
 	    function Resource(name, id) {
 	        this.id = id;
@@ -433,7 +453,7 @@
 	    Resource.prototype.getId = function () {
 	        return this.id;
 	    };
-	    Resource.prototype.toHAL = function () {
+	    Resource.prototype.toHAL = function (isRoot) {
 	        return __awaiter(this, void 0, void 0, function () {
 	            var __this, hal, i, embeddedResource, service, res;
 	            return __generator(this, function (_a) {
@@ -451,7 +471,7 @@
 	                            hal[key] = __this[key];
 	                        });
 	                        hal._links = {
-	                            self: __this.name + "/" + __this.id
+	                            self: utils_1.removeDuplicatedSlashes(Application_1.default.HOST + "/" + Application_1.default.API_VERSION + "/" + __this.name + "/" + __this.id)
 	                        };
 	                        i = 0;
 	                        _a.label = 1;
@@ -534,6 +554,38 @@
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
+	/**
+	 * Given an url as an string, removes duplicated slashes from it.
+	 * Example:
+	 * http://www.google.com// -> http://www.google.com/
+	 * @param url url to which duplicated slashes will be removed from
+	 */
+	function removeDuplicatedSlashes(url) {
+	    return url.replace(/([^:]\/)\/+/g, "$1");
+	}
+	exports.removeDuplicatedSlashes = removeDuplicatedSlashes;
+	/**
+	 * Injects named parameters as query params
+	 * @param req HTTP request
+	 *
+	 * //TODO this is not optimal at all. I need to somehow implement a decorator that executes
+	 * //each and every time before a @route annotated method.
+	 */
+	function injectIdParams(req) {
+	    Object.keys(req.params).forEach(function (paramName) {
+	        if (req.params[paramName])
+	            req.query[paramName] = req.params[paramName];
+	    });
+	}
+	exports.injectIdParams = injectIdParams;
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
 	var PersonalInfo = (function () {
 	    /**
 	     * constructor
@@ -581,7 +633,7 @@
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -621,10 +673,10 @@
 	    }
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var PostgreCriteria_1 = __webpack_require__(17);
+	var PostgreCriteria_1 = __webpack_require__(18);
 	var AppLogEntry_1 = __webpack_require__(13);
 	var AppLogType_1 = __webpack_require__(14);
-	var pool = __webpack_require__(19);
+	var pool = __webpack_require__(22);
 	/**
 	 * PostgreSql Repository
 	 * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
@@ -661,8 +713,8 @@
 	                        _a.label = 1;
 	                    case 1:
 	                        _a.trys.push([1, 3, , 4]);
-	                        resolvedCriteria = criteria.resolve();
-	                        return [4 /*yield*/, pool.query("SELECT * FROM " + this.getName() + " WHERE " + resolvedCriteria.statement.toUpperCase(), resolvedCriteria.values)];
+	                        resolvedCriteria = criteria.resolve(this.getName());
+	                        return [4 /*yield*/, pool.query(resolvedCriteria.statement, resolvedCriteria.values)];
 	                    case 2:
 	                        res = _a.sent();
 	                        if (res.rows.length === 0) {
@@ -685,32 +737,6 @@
 	            });
 	        });
 	    };
-	    PostgreRepository.prototype.getById = function (id) {
-	        return __awaiter(this, void 0, void 0, function () {
-	            var res, row, err_2;
-	            return __generator(this, function (_a) {
-	                switch (_a.label) {
-	                    case 0:
-	                        _a.trys.push([0, 2, , 3]);
-	                        return [4 /*yield*/, pool.query("SELECT * FROM " + this.getName() + " WHERE ID=$1::bigint", [id])];
-	                    case 1:
-	                        res = _a.sent();
-	                        if (res.rows.length === 0) {
-	                            throw new AppLogEntry_1.default(AppLogType_1.default.INFO, "Does not exist a " + this.getName() + " with id: " + id);
-	                        }
-	                        else {
-	                            row = res['rows'][0];
-	                            return [2 /*return*/, this.transform(row)];
-	                        }
-	                        return [3 /*break*/, 3];
-	                    case 2:
-	                        err_2 = _a.sent();
-	                        throw err_2;
-	                    case 3: return [2 /*return*/];
-	                }
-	            });
-	        });
-	    };
 	    PostgreRepository.prototype.create = function (instance) {
 	        throw new Error('Method not implemented.');
 	    };
@@ -726,13 +752,14 @@
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var QueryTuple_1 = __webpack_require__(18);
-	var utils_postgre_1 = __webpack_require__(19);
+	var QueryTuple_1 = __webpack_require__(19);
+	var utils_db_1 = __webpack_require__(20);
+	var utils_postgre_1 = __webpack_require__(22);
 	var PostgreCriteria = (function () {
 	    function PostgreCriteria(tuples) {
 	        this.tuples = tuples;
@@ -740,17 +767,41 @@
 	    PostgreCriteria.prototype.getTuples = function () {
 	        return this.tuples;
 	    };
-	    PostgreCriteria.prototype.resolve = function () {
-	        var _this = this;
-	        var statement = " ";
+	    PostgreCriteria.prototype.resolve = function (tableName) {
+	        var __this = this;
+	        var statement = "SELECT * FROM " + tableName;
+	        var whereStatement = "";
+	        var paginationStatement = "";
+	        var page;
+	        var pageSize;
 	        var values = [];
-	        this.tuples.forEach(function (tuple, idx) {
-	            var fieldPosition = idx + 1;
-	            values.push(tuple.fieldValue);
-	            //TODO In next line, equals is hardcoded. Based on Op type, it would transform criteria statement
-	            statement += tuple.fieldName + "::" + tuple.fieldType + "=$" + fieldPosition;
-	            _this.tuples.length < idx ? statement += " AND " : '';
+	        var fieldPosition = 0;
+	        __this.tuples.forEach(function (tuple, idx) {
+	            fieldPosition++;
+	            switch (tuple.fieldName) {
+	                case 'page':
+	                case 'page_size':
+	                    if (tuple.fieldName === 'page_size') {
+	                        pageSize = tuple.fieldValue;
+	                        paginationStatement += "LIMIT $" + fieldPosition + " ";
+	                        values.push(pageSize);
+	                    }
+	                    if (tuple.fieldName === 'page') {
+	                        paginationStatement += "OFFSET $" + fieldPosition + " ";
+	                        values.push((tuple.fieldValue - 1) * pageSize);
+	                    }
+	                    break;
+	                default:
+	                    values.push(tuple.fieldValue);
+	                    whereStatement += tuple.fieldName + "::" + tuple.fieldType + utils_postgre_1.resolveTupleOperation(tuple.operation) + "$" + fieldPosition;
+	                    whereStatement += " AND ";
+	                    break;
+	            }
 	        });
+	        whereStatement = whereStatement.substring(0, whereStatement.length - " AND ".length);
+	        whereStatement ? statement += " WHERE " + whereStatement : '';
+	        paginationStatement ? statement += " " + paginationStatement + " " : '';
+	        statement = statement.toUpperCase();
 	        return { statement: statement, values: values };
 	    };
 	    PostgreCriteria.prototype.create = function (request, mapper) {
@@ -759,9 +810,8 @@
 	    PostgreCriteria.create = function (request, mapper) {
 	        var tuples = [];
 	        Object.keys(request.query).forEach(function (key) {
-	            tuples.push(new QueryTuple_1.default(key, request.query.key, mapper(request.query.key), utils_postgre_1.resolveOperation(key)));
+	            tuples.push(new QueryTuple_1.default(key, request.query[key], mapper(key), utils_db_1.resolveOperation(key)));
 	        });
-	        //TODO Add logic to extract req.params!
 	        return new PostgreCriteria(tuples);
 	    };
 	    return PostgreCriteria;
@@ -770,7 +820,7 @@
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -800,32 +850,12 @@
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var QueryTupleOperation_1 = __webpack_require__(20);
-	var props = __webpack_require__(21);
-	var pg = __webpack_require__(25);
-	var pool = new pg.Pool(props().postgresql);
-	pool.on('error', function (err, client) {
-	    console.error('idle client error', err.message, err.stack);
-	});
-	module.exports.query = function (text, values, callback) {
-	    return pool.query(text, values, callback);
-	};
-	module.exports.connect = function (callback) {
-	    return pool.connect(callback);
-	};
-	module.exports.resolveTuple = function (op) {
-	    switch (op) {
-	        case QueryTupleOperation_1.default.CONTAINS: return '';
-	        case QueryTupleOperation_1.default.EQUALS: return '';
-	        case QueryTupleOperation_1.default.GREATER_THAN: return '';
-	        case QueryTupleOperation_1.default.LESSER_THAN: return '';
-	    }
-	};
+	var QueryTupleOperation_1 = __webpack_require__(21);
 	function resolveOperation(key) {
 	    var _containsPrefix = function (key) {
 	        return !key || key[2] != '_' || key.length < 3;
@@ -845,7 +875,7 @@
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -861,13 +891,44 @@
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var local = __webpack_require__(22);
-	var dev = __webpack_require__(23);
-	var prod = __webpack_require__(24);
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var QueryTupleOperation_1 = __webpack_require__(21);
+	var props = __webpack_require__(23);
+	var pg = __webpack_require__(27);
+	var pool = new pg.Pool(props().postgresql);
+	function resolveTupleOperation(op) {
+	    switch (op) {
+	        //TODO Do the resolution for contains! :)
+	        case QueryTupleOperation_1.default.CONTAINS: return '';
+	        case QueryTupleOperation_1.default.EQUALS: return '=';
+	        case QueryTupleOperation_1.default.GREATER_THAN: return '>';
+	        case QueryTupleOperation_1.default.LESSER_THAN: return '<';
+	    }
+	}
+	exports.resolveTupleOperation = resolveTupleOperation;
+	pool.on('error', function (err, client) {
+	    console.error('idle client error', err.message, err.stack);
+	});
+	module.exports.query = function (text, values, callback) {
+	    return pool.query(text, values, callback);
+	};
+	module.exports.connect = function (callback) {
+	    return pool.connect(callback);
+	};
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var local = __webpack_require__(24);
+	var dev = __webpack_require__(25);
+	var prod = __webpack_require__(26);
 	function properties() {
 	    switch (process.env.APP_ENV) {
 	        case 'local': return local.default;
@@ -877,44 +938,6 @@
 	    }
 	}
 	module.exports = properties;
-
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = {
-	    "postgresql": {
-	        "user": "juan",
-	        "database": "autokal",
-	        "password": "travel",
-	        "host": "localhost",
-	        "port": 5432,
-	        "max": 10,
-	        "idleTimeoutMillis": 30000
-	    }
-	};
-
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = {
-	    "postgresql": {
-	        "user": "juan",
-	        "database": "autokal",
-	        "password": "travel",
-	        "host": "localhost",
-	        "port": 5432,
-	        "max": 10,
-	        "idleTimeoutMillis": 30000
-	    }
-	};
 
 
 /***/ }),
@@ -940,43 +963,63 @@
 /* 25 */
 /***/ (function(module, exports) {
 
-	module.exports = require("pg");
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = {
+	    "postgresql": {
+	        "user": "juan",
+	        "database": "autokal",
+	        "password": "travel",
+	        "host": "localhost",
+	        "port": 5432,
+	        "max": 10,
+	        "idleTimeoutMillis": 30000
+	    }
+	};
+
 
 /***/ }),
 /* 26 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var AppLogEntry_1 = __webpack_require__(13);
-	function Log(err) {
-	    if (err instanceof AppLogEntry_1.default) {
-	        return err.toJSON();
+	exports.default = {
+	    "postgresql": {
+	        "user": "juan",
+	        "database": "autokal",
+	        "password": "travel",
+	        "host": "localhost",
+	        "port": 5432,
+	        "max": 10,
+	        "idleTimeoutMillis": 30000
 	    }
-	    else {
-	        return err.toJSON();
-	    }
-	}
-	exports.default = Log;
+	};
 
 
 /***/ }),
 /* 27 */
+/***/ (function(module, exports) {
+
+	module.exports = require("pg");
+
+/***/ }),
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var RouterFactory_1 = __webpack_require__(8);
-	function route(verb, url) {
+	function route(verb, urls) {
 	    return function (target, propertyKey, descriptor) {
-	        RouterFactory_1.default.create(verb, url, target[propertyKey]);
+	        RouterFactory_1.default.create(verb, urls, target[propertyKey]);
 	    };
 	}
 	exports.default = route;
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1035,11 +1078,11 @@
 	    }
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Message_1 = __webpack_require__(29);
-	var PostgreRepository_1 = __webpack_require__(16);
+	var Message_1 = __webpack_require__(30);
+	var PostgreRepository_1 = __webpack_require__(17);
 	var Method_1 = __webpack_require__(9);
-	var Log_1 = __webpack_require__(26);
-	var route_1 = __webpack_require__(27);
+	var route_1 = __webpack_require__(28);
+	var utils_1 = __webpack_require__(15);
 	var __this;
 	var MessageService = (function (_super) {
 	    __extends(MessageService, _super);
@@ -1050,48 +1093,46 @@
 	    }
 	    MessageService.prototype.searchForMessages = function (req, res, next) {
 	        return __awaiter(this, void 0, void 0, function () {
-	            var result, halResult, err_1;
+	            var result, r, halResult, i, r, err_1;
 	            return __generator(this, function (_a) {
 	                switch (_a.label) {
 	                    case 0:
-	                        _a.trys.push([0, 3, , 4]);
+	                        utils_1.injectIdParams(req);
+	                        _a.label = 1;
+	                    case 1:
+	                        _a.trys.push([1, 10, , 11]);
 	                        return [4 /*yield*/, __this.searchByRequest(req, Message_1.default.getPropertyType)];
-	                    case 1:
-	                        result = _a.sent();
-	                        return [4 /*yield*/, result.toHAL()];
 	                    case 2:
-	                        halResult = _a.sent();
-	                        res.send(halResult);
-	                        return [3 /*break*/, 4];
+	                        result = _a.sent();
+	                        if (!req.params.id) return [3 /*break*/, 4];
+	                        return [4 /*yield*/, result[0].toHAL()];
 	                    case 3:
+	                        r = _a.sent();
+	                        res.send(r);
+	                        return [3 /*break*/, 9];
+	                    case 4:
+	                        halResult = [];
+	                        i = 0;
+	                        _a.label = 5;
+	                    case 5:
+	                        if (!(i < result.length)) return [3 /*break*/, 8];
+	                        return [4 /*yield*/, result[i].toHAL()];
+	                    case 6:
+	                        r = _a.sent();
+	                        halResult.push(r);
+	                        _a.label = 7;
+	                    case 7:
+	                        i++;
+	                        return [3 /*break*/, 5];
+	                    case 8:
+	                        res.send(halResult);
+	                        _a.label = 9;
+	                    case 9: return [3 /*break*/, 11];
+	                    case 10:
 	                        err_1 = _a.sent();
-	                        res.send(Log_1.default(err_1));
-	                        return [3 /*break*/, 4];
-	                    case 4: return [2 /*return*/];
-	                }
-	            });
-	        });
-	    };
-	    MessageService.prototype.getMessageById = function (req, res, next) {
-	        return __awaiter(this, void 0, void 0, function () {
-	            var result, halResult, err_2;
-	            return __generator(this, function (_a) {
-	                switch (_a.label) {
-	                    case 0:
-	                        _a.trys.push([0, 3, , 4]);
-	                        return [4 /*yield*/, __this.getById(req.params.message_id)];
-	                    case 1:
-	                        result = _a.sent();
-	                        return [4 /*yield*/, result.toHAL()];
-	                    case 2:
-	                        halResult = _a.sent();
-	                        res.send(halResult);
-	                        return [3 /*break*/, 4];
-	                    case 3:
-	                        err_2 = _a.sent();
-	                        res.send(Log_1.default(err_2));
-	                        return [3 /*break*/, 4];
-	                    case 4: return [2 /*return*/];
+	                        res.send(err_1);
+	                        return [3 /*break*/, 11];
+	                    case 11: return [2 /*return*/];
 	                }
 	            });
 	        });
@@ -1115,22 +1156,16 @@
 	    return MessageService;
 	}(PostgreRepository_1.default));
 	__decorate([
-	    route_1.default(Method_1.default.GET, '/profile/:profile_id/message'),
+	    route_1.default(Method_1.default.GET, ['/profile/:profileId/message', '/profile/:profileId/message/:id']),
 	    __metadata("design:type", Function),
 	    __metadata("design:paramtypes", [Object, Object, Object]),
 	    __metadata("design:returntype", Promise)
 	], MessageService.prototype, "searchForMessages", null);
-	__decorate([
-	    route_1.default(Method_1.default.GET, '/profile/:profile_id/message/:message_id'),
-	    __metadata("design:type", Function),
-	    __metadata("design:paramtypes", [Object, Object, Object]),
-	    __metadata("design:returntype", Promise)
-	], MessageService.prototype, "getMessageById", null);
 	exports.default = MessageService;
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1146,11 +1181,11 @@
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Resource_1 = __webpack_require__(12);
-	var EmbeddedResource_1 = __webpack_require__(30);
-	var PostgreCriteria_1 = __webpack_require__(17);
-	var MessageSocialInfo_1 = __webpack_require__(31);
-	var QueryTuple_1 = __webpack_require__(18);
-	var QueryTupleOperation_1 = __webpack_require__(20);
+	var EmbeddedResource_1 = __webpack_require__(31);
+	var PostgreCriteria_1 = __webpack_require__(18);
+	var MessageSocialInfo_1 = __webpack_require__(32);
+	var QueryTuple_1 = __webpack_require__(19);
+	var QueryTupleOperation_1 = __webpack_require__(21);
 	var Profile_1 = __webpack_require__(11);
 	var Message = (function (_super) {
 	    __extends(Message, _super);
@@ -1171,6 +1206,9 @@
 	        _this.profileId = profileId;
 	        return _this;
 	    }
+	    /**
+	     * Define the list of embedded resources of the resource
+	     */
 	    Message.prototype.embeddeds = function () {
 	        return [
 	            new EmbeddedResource_1.default('profile', Profile_1.default.RESOURCE_NAME, new PostgreCriteria_1.default([new QueryTuple_1.default('id', this.profileId, 'bigint', QueryTupleOperation_1.default.EQUALS)]))
@@ -1180,16 +1218,7 @@
 	        return Message.transform(obj);
 	    };
 	    Message.transform = function (obj) {
-	        var messageSocialInfo = {
-	            likecounter: parseInt(obj.likecounter),
-	            lovecounter: parseInt(obj.lovecounter),
-	            funcounter: parseInt(obj.funcounter),
-	            wowcounter: parseInt(obj.wowcounter),
-	            sadcounter: parseInt(obj.sadcounter),
-	            angrycounter: parseInt(obj.angrycounter),
-	            reportcounter: parseInt(obj.reportcounter)
-	        };
-	        return new Message(obj.value, obj.date, MessageSocialInfo_1.default.transform(messageSocialInfo), obj.profileid, obj.id);
+	        return new Message(obj.value, obj.date, MessageSocialInfo_1.default.transform(obj), obj.profileid, obj.id);
 	    };
 	    Message.prototype.validate = function (obj) {
 	        return Message.validate(obj);
@@ -1197,6 +1226,10 @@
 	    Message.validate = function (obj) {
 	        return;
 	    };
+	    /**
+	     * Given the name of a property, returns its database type
+	     * @param propertyName the name of the property to which type will be resolved
+	     */
 	    Message.getPropertyType = function (propertyName) {
 	        if (propertyName.startsWith('messageSocialInfo')) {
 	            propertyName = propertyName.split('.')[0];
@@ -1205,7 +1238,7 @@
 	        switch (propertyName.toLocaleLowerCase()) {
 	            case 'id': return 'bigint';
 	            case 'date': return 'bigint';
-	            case 'profileId': return 'bigint';
+	            case 'profileid': return 'bigint';
 	        }
 	    };
 	    return Message;
@@ -1215,7 +1248,7 @@
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -1241,7 +1274,7 @@
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -1271,7 +1304,7 @@
 	        return MessageSocialInfo.transform(obj);
 	    };
 	    MessageSocialInfo.transform = function (obj) {
-	        return new MessageSocialInfo(obj.likecounter, obj.lovecounter, obj.funcounter, obj.wowcounter, obj.sadcounter, obj.angrycounter, obj.reportcounter);
+	        return new MessageSocialInfo(parseInt(obj.likecounter), parseInt(obj.lovecounter), parseInt(obj.funcounter), parseInt(obj.wowcounter), parseInt(obj.sadcounter), parseInt(obj.angrycounter), parseInt(obj.reportcounter));
 	    };
 	    MessageSocialInfo.prototype.validate = function (obj) {
 	        return MessageSocialInfo.validate(obj);
@@ -1281,13 +1314,13 @@
 	    };
 	    MessageSocialInfo.getPropertyType = function (propertyName) {
 	        switch (propertyName.toLowerCase()) {
-	            case 'likeCounter': return 'int';
-	            case 'loveCounter': return 'int';
-	            case 'funCounter': return 'int';
-	            case 'wowCounter': return 'int';
-	            case 'sadCounter': return 'int';
-	            case 'angryCounter': return 'int';
-	            case 'reportCounter': return 'int';
+	            case 'likecounter': return 'int';
+	            case 'lovecounter': return 'int';
+	            case 'funcounter': return 'int';
+	            case 'wowcounter': return 'int';
+	            case 'sadcounter': return 'int';
+	            case 'angrycounter': return 'int';
+	            case 'reportcounter': return 'int';
 	        }
 	    };
 	    return MessageSocialInfo;
@@ -1296,10 +1329,10 @@
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	const root = __webpack_require__(33).path;
+	const root = __webpack_require__(34).path;
 	
 	module.exports = {
 	    entry: `${root}/src/start.ts`,
@@ -1331,7 +1364,7 @@
 	};
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports) {
 
 	module.exports = require("app-root-path");

@@ -1,7 +1,6 @@
 import Profile from '../resource/Profile'
 import PostgreRepository from '../lib/db/postgre/PostgreRepository'
 import Method from '../lib/constant/Method'
-import Log from '../lib/error/Log'
 import route from '../lib/annotation/route'
 var __this;
 
@@ -18,7 +17,7 @@ export default class ProfileService extends PostgreRepository<Profile> {
             result = await result.toHAL()
             res.send(result)
         } catch (err) {
-            res.send(Log(err))
+            res.send(err)
         }
     }
 

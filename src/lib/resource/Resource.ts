@@ -3,6 +3,7 @@ import AppLogType from '../error/AppLogType'
 import EmbeddedResource from './EmbeddedResource'
 import Transformable from '../repository/Transformable'
 import Application from '../application/Application'
+import { removeDuplicatedSlashes } from '../utils/utils'
 
 abstract class Resource<T> implements Transformable<T>{
 
@@ -29,7 +30,7 @@ abstract class Resource<T> implements Transformable<T>{
         return this.id;
     }
 
-    async toHAL() {
+    async toHAL(isRoot?: boolean) {
         let __this = this;
         if (!__this.id) {
             throw new AppLogEntry(AppLogType.ERROR, `A resource must contain an ID to be represented`);
@@ -45,7 +46,7 @@ abstract class Resource<T> implements Transformable<T>{
         });
 
         hal._links = {
-            self: `${__this.name}/${__this.id}`
+            self: removeDuplicatedSlashes(`${Application.HOST}/${Application.API_VERSION}/${__this.name}/${__this.id}`)
         };
 
         for (var i = 0; i < __this.embeddeds().length; i++) {

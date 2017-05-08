@@ -31,8 +31,8 @@ abstract class PostgreRepository<T extends Resource<T>> implements Repository<T>
        let __this = this
        let resolvedCriteria
        try {
-            resolvedCriteria = criteria.resolve()
-            let res = await pool.query(`SELECT * FROM ${this.getName()} WHERE ${resolvedCriteria.statement.toUpperCase()}`, resolvedCriteria.values)
+            resolvedCriteria = criteria.resolve(this.getName())
+            let res = await pool.query(resolvedCriteria.statement, resolvedCriteria.values)
             if (res.rows.length === 0) {
                 throw new AppLogEntry(AppLogType.INFO, `Does not exist any ${this.getName()}`)
             } else {
@@ -46,20 +46,6 @@ abstract class PostgreRepository<T extends Resource<T>> implements Repository<T>
         } catch (err) {
             throw new AppLogEntry(AppLogType.ERROR, `Failed to execute PostgreRepository.search(${JSON.stringify(resolvedCriteria)})`)
         } 
-    }
-
-    async getById(id: string): Promise<T> {
-        try {
-            let res = await pool.query(`SELECT * FROM ${this.getName()} WHERE ID=$1::bigint`, [id])
-            if (res.rows.length === 0) {
-                throw new AppLogEntry(AppLogType.INFO, `Does not exist a ${this.getName()} with id: ${id}`)
-            } else {
-                let row = res['rows'][0]
-                return this.transform(row)
-            }
-        } catch (err) {
-            throw err
-        }
     }
 
     create(instance: T): T {

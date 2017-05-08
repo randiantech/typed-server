@@ -39,13 +39,13 @@ export default class MessageSocialInfo implements Transformable<MessageSocialInf
 
     static transform(obj: any): MessageSocialInfo {
         return new MessageSocialInfo(
-            obj.likecounter, 
-            obj.lovecounter, 
-            obj.funcounter, 
-            obj.wowcounter, 
-            obj.sadcounter, 
-            obj.angrycounter, 
-            obj.reportcounter)
+            parseInt(obj.likecounter), 
+            parseInt(obj.lovecounter), 
+            parseInt(obj.funcounter), 
+            parseInt(obj.wowcounter), 
+            parseInt(obj.sadcounter), 
+            parseInt(obj.angrycounter), 
+            parseInt(obj.reportcounter))
     }
 
     validate(obj: any) {
@@ -58,13 +58,13 @@ export default class MessageSocialInfo implements Transformable<MessageSocialInf
 
     static getPropertyType(propertyName: string): string {
         switch(propertyName.toLowerCase()) {
-            case 'likeCounter': return 'int'
-            case 'loveCounter': return 'int'
-            case 'funCounter': return 'int'
-            case 'wowCounter': return 'int'
-            case 'sadCounter': return 'int'
-            case 'angryCounter': return 'int'
-            case 'reportCounter': return 'int'
+            case 'likecounter': return 'int'
+            case 'lovecounter': return 'int'
+            case 'funcounter': return 'int'
+            case 'wowcounter': return 'int'
+            case 'sadcounter': return 'int'
+            case 'angrycounter': return 'int'
+            case 'reportcounter': return 'int'
         }
     }
 }

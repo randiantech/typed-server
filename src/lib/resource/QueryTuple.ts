@@ -7,11 +7,11 @@ export default class QueryTuple {
 
 
     fieldName: string
-    fieldValue: string | string[] | number | number[]
+    fieldValue: string | string[] | number | number[] | any
     fieldType: string
     operation: QueryTupleOperation
 
-    constructor(fieldName: string, fieldValue: string | string[] | number | number[], fieldType: string, operation: QueryTupleOperation) {
+    constructor(fieldName: string, fieldValue: string | string[] | number | number[] | any, fieldType: string, operation: QueryTupleOperation) {
         this.fieldName = fieldName
         this.fieldValue = fieldValue
         this.fieldType = fieldType
@@ -22,7 +22,7 @@ export default class QueryTuple {
         return this.fieldName
     }
 
-    getFieldValue(): string | string[] | number | number[] {
+    getFieldValue(): string | string[] | number | number[] | any {
         return this.fieldValue
     }
 

@@ -4,7 +4,8 @@ import AppLogType from '../../error/AppLogType'
 import Transformable from '../../repository/Transformable'
 import QueryTuple from '../../resource/QueryTuple'
 import QueryTupleOperation from '../../resource/QueryTupleOperation'
-import { resolveOperation } from './utils.postgre'
+import { resolveOperation } from '../../utils/utils.db'
+import { resolveTupleOperation } from './utils.postgre'
 
 export default class PostgreCriteria implements Criteria {
 
@@ -18,17 +19,45 @@ export default class PostgreCriteria implements Criteria {
         return this.tuples
     }
 
-    resolve(): { statement: string, values: any } {
-        let statement = ` `
+    resolve(tableName?: string): { statement: string, values: any } {
+        let __this = this
+        let statement = `SELECT * FROM ${tableName}`
+        let whereStatement = ``
+        let paginationStatement = ``
+        let page
+        let pageSize
         let values = []
+        let fieldPosition = 0
 
-        this.tuples.forEach((tuple, idx) => {
-            let fieldPosition = idx + 1
-            values.push(tuple.fieldValue)
-            //TODO In next line, equals is hardcoded. Based on Op type, it would transform criteria statement
-            statement += `${tuple.fieldName}::${tuple.fieldType}=$${fieldPosition}`
-            this.tuples.length < idx ? statement += ` AND ` : ''
+        __this.tuples.forEach((tuple, idx) => {
+            fieldPosition++
+            switch (tuple.fieldName) {
+                case 'page':
+                case 'page_size':
+                    if (tuple.fieldName === 'page_size') {
+                        pageSize = tuple.fieldValue
+                        paginationStatement += `LIMIT $${fieldPosition} `
+                        values.push(pageSize)
+                    }
+                    if (tuple.fieldName === 'page') {
+                        paginationStatement += `OFFSET $${fieldPosition} `
+                        values.push((tuple.fieldValue - 1) * pageSize)
+                    }
+                    break
+
+                default:
+                    values.push(tuple.fieldValue)
+                    whereStatement += `${tuple.fieldName}::${tuple.fieldType}${resolveTupleOperation(tuple.operation)}$${fieldPosition}`
+                    whereStatement += ` AND `
+                    break
+            }
         })
+
+
+        whereStatement = whereStatement.substring(0, whereStatement.length - ` AND `.length)
+        whereStatement ? statement += ` WHERE ${whereStatement}` : ''
+        paginationStatement ? statement += ` ${paginationStatement} ` : ''
+        statement = statement.toUpperCase()
 
         return { statement, values }
     }
@@ -41,10 +70,8 @@ export default class PostgreCriteria implements Criteria {
         let tuples = []
 
         Object.keys(request.query).forEach((key) => {
-            tuples.push(new QueryTuple(key, request.query.key, mapper(request.query.key), resolveOperation(key)))
+            tuples.push(new QueryTuple(key, request.query[key], mapper(key), resolveOperation(key)))
         })
-
-        //TODO Add logic to extract req.params!
 
         return new PostgreCriteria(tuples)
     }

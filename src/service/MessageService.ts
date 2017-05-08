@@ -2,36 +2,36 @@ import Message from '../resource/Message'
 import PostgreRepository from '../lib/db/postgre/PostgreRepository'
 import PostgresCriteria from '../lib/db/postgre/PostgreCriteria'
 import Method from '../lib/constant/Method'
-import Log from '../lib/error/Log'
 import route from '../lib/annotation/route'
+import { injectIdParams } from '../lib/utils/utils'
 var __this;
 
 export default class MessageService extends PostgreRepository<Message> {
-    
+
     constructor() {
         super(Message.RESOURCE_NAME)
         __this = this
     }
 
-    @route(Method.GET, '/profile/:profile_id/message')
+    @route(Method.GET, ['/profile/:profileId/message', '/profile/:profileId/message/:id'])
     async searchForMessages(req, res, next) {
+        injectIdParams(req)
         try {
             let result = await __this.searchByRequest(req, Message.getPropertyType)
-            let halResult = await result.toHAL()
-            res.send(halResult)
+            if (req.params.id) {
+                let r = await result[0].toHAL()
+                res.send(r)
+            } else {
+                //TODO the response is actually not a HAL collection based on standard; just an Array
+                let halResult = []
+                for(var i = 0; i < result.length; i++){
+                    let r = await result[i].toHAL()
+                    halResult.push(r)
+                }
+                res.send(halResult)
+            }
         } catch (err) {
-            res.send(Log(err))
-        }
-    }
-
-    @route(Method.GET, '/profile/:profile_id/message/:message_id')
-    async getMessageById(req, res, next) {
-        try {
-            let result = await __this.getById(req.params.message_id)
-            let halResult = await result.toHAL()
-            res.send(halResult)
-        } catch (err) {
-            res.send(Log(err))
+            res.send(err)
         }
     }
 

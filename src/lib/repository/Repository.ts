@@ -20,11 +20,6 @@ interface Repository<T> extends Transformable<T> {
     searchByRequest(request:any, mapper:any): Promise<T[]>
 
     /**
-     * Gets a resource instance by ID
-     */
-    getById(id: string): Promise<T>
-
-    /**
      * Creates a resource instance
      */
     create(instance: T): T
@@ -38,6 +33,7 @@ interface Repository<T> extends Transformable<T> {
      * Deletes an existing instance
      */
     delete(id: string): T
+
 }
 
 export default Repository

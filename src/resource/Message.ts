@@ -32,6 +32,9 @@ export default class Message extends Resource<Message> {
         this.profileId = profileId
     }
 
+    /**
+     * Define the list of embedded resources of the resource
+     */
     embeddeds(): EmbeddedResource[] {
         return [
             new EmbeddedResource(
@@ -46,17 +49,7 @@ export default class Message extends Resource<Message> {
     }
 
     static transform(obj: any): Message {
-        let messageSocialInfo = {
-            likecounter: parseInt(obj.likecounter),
-            lovecounter: parseInt(obj.lovecounter),
-            funcounter: parseInt(obj.funcounter),
-            wowcounter: parseInt(obj.wowcounter),
-            sadcounter: parseInt(obj.sadcounter),
-            angrycounter: parseInt(obj.angrycounter),
-            reportcounter: parseInt(obj.reportcounter)
-        }
-
-        return new Message(obj.value, obj.date, MessageSocialInfo.transform(messageSocialInfo), obj.profileid, obj.id)
+        return new Message(obj.value, obj.date, MessageSocialInfo.transform(obj), obj.profileid, obj.id)
     }
 
     validate(obj: any) {
@@ -67,6 +60,10 @@ export default class Message extends Resource<Message> {
         return
     }
 
+    /**
+     * Given the name of a property, returns its database type
+     * @param propertyName the name of the property to which type will be resolved 
+     */
     static getPropertyType(propertyName: string): string {
         if(propertyName.startsWith('messageSocialInfo')){
             propertyName = propertyName.split('.')[0]
@@ -76,7 +73,7 @@ export default class Message extends Resource<Message> {
         switch(propertyName.toLocaleLowerCase()) {
             case 'id': return 'bigint'
             case 'date': return 'bigint'
-            case 'profileId': return 'bigint'
+            case 'profileid': return 'bigint'
         }
     }
 }
