@@ -45,7 +45,7 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 	__webpack_require__(1);
-	module.exports = __webpack_require__(39);
+	module.exports = __webpack_require__(41);
 
 
 /***/ }),
@@ -57,23 +57,27 @@
 	var Application_1 = __webpack_require__(2);
 	var ProfileService_1 = __webpack_require__(10);
 	var MessageService_1 = __webpack_require__(36);
+	var TrendingService_1 = __webpack_require__(43);
 	var MapperProvider_1 = __webpack_require__(19);
 	var Message_mapper_1 = __webpack_require__(30);
-	var MessageSocialInfo_mapper_1 = __webpack_require__(37);
-	var PersonalInfo_mapper_1 = __webpack_require__(38);
+	var Trending_mapper_1 = __webpack_require__(37);
+	var MessageSocialInfo_mapper_1 = __webpack_require__(38);
+	var PersonalInfo_mapper_1 = __webpack_require__(39);
 	var Profile_mapper_1 = __webpack_require__(31);
 	var Message_1 = __webpack_require__(28);
 	var MessageSocialInfo_1 = __webpack_require__(29);
 	var PersonalInfo_1 = __webpack_require__(15);
 	var Profile_1 = __webpack_require__(11);
+	var Trending_1 = __webpack_require__(40);
 	var port = process.env.APP_PORT;
 	var apiVersion = 2;
 	var host = "http://localhost:3000/";
 	MapperProvider_1.default.add(Message_1.default.name, Message_mapper_1.default);
+	MapperProvider_1.default.add(Trending_1.default.name, Trending_mapper_1.default);
 	MapperProvider_1.default.add(MessageSocialInfo_1.default.name, MessageSocialInfo_mapper_1.default);
 	MapperProvider_1.default.add(PersonalInfo_1.default.name, PersonalInfo_mapper_1.default);
 	MapperProvider_1.default.add(Profile_1.default.name, Profile_mapper_1.default);
-	new Application_1.default([new ProfileService_1.default(), new MessageService_1.default()], port, apiVersion, host);
+	new Application_1.default([new ProfileService_1.default(), new MessageService_1.default(), new TrendingService_1.default()], port, apiVersion, host);
 
 
 /***/ }),
@@ -1762,6 +1766,36 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = {
+	    "id": {
+	        "type": "bigint",
+	        "name": "id"
+	    },
+	    "image": {
+	        "type": "text",
+	        "name": "image"
+	    },
+	    "title": {
+	        "type": "text",
+	        "name": "title"
+	    },
+	    "location": {
+	        "type": "text",
+	        "name": "location"
+	    },
+	    "fans": {
+	        "type": "bigint",
+	        "name": "fans"
+	    }
+	};
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = {
 	    "likeCounter": {
 	        "type": "bigint",
 	        "name": "likecounter"
@@ -1794,7 +1828,7 @@
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -1828,10 +1862,90 @@
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	const root = __webpack_require__(40).path;
+	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Resource_1 = __webpack_require__(12);
+	var mapper = __webpack_require__(37);
+	/**
+	 * Trending Resource definition
+	 * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
+	 */
+	var Trending = (function (_super) {
+	    __extends(Trending, _super);
+	    /**
+	     * constructor
+	     * @param image Image of the trending event
+	     * @param title Title of the trending event
+	     * @param location Location of the trending event
+	     * @param fans Number of current fans on the trending event
+	     * @param id the id of the resource
+	     */
+	    function Trending(image, title, location, fans, id) {
+	        var _this = _super.call(this, Trending.RESOURCE_NAME, id) || this;
+	        _this.validate({ image: image, title: title, location: location, id: id });
+	        _this.image = image;
+	        _this.title = title;
+	        _this.location = location;
+	        _this.fans = fans;
+	        return _this;
+	    }
+	    /**
+	     * Attempts to create a Trending object from given plain javascript object input
+	     * @param obj the object from which it will be tried to be constructed an instance of Trending class
+	     * @returns {Trending} instance of Trending class
+	     */
+	    Trending.prototype.create = function (obj) {
+	        return Trending.create(obj);
+	    };
+	    /**
+	     * Attempts to create a Trending object from given plain javascript object input
+	     * @param obj the object from which it will be tried to be constructed an instance of Trending class
+	     * @returns {Trending} instance of Trending class
+	     */
+	    Trending.create = function (obj) {
+	        return new Trending(obj.image, obj.title, obj.location, parseInt(obj.fans), obj.id);
+	    };
+	    /**
+	     * Validates whether or not supplied object contains valid parameters to construct a Trending instance
+	     * @param obj object to be validated
+	     */
+	    Trending.prototype.validate = function (obj) {
+	        return;
+	    };
+	    /**
+	     * Defines the list of embedded resources of the Trending resource
+	     * @returns {EmbeddedResource[]} list of EmbeddedResource
+	     */
+	    Trending.prototype.embeddeds = function () {
+	        return [];
+	    };
+	    return Trending;
+	}(Resource_1.default));
+	/**
+	 * @type {string} the name of the resource
+	 */
+	Trending.RESOURCE_NAME = 'trending';
+	exports.default = Trending;
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	const root = __webpack_require__(42).path;
 	
 	module.exports = {
 	    entry: `${root}/src/start.ts`,
@@ -1863,10 +1977,105 @@
 	};
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, exports) {
 
 	module.exports = require("app-root-path");
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+	        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+	        step((generator = generator.apply(thisArg, _arguments || [])).next());
+	    });
+	};
+	var __generator = (this && this.__generator) || function (thisArg, body) {
+	    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+	    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+	    function verb(n) { return function (v) { return step([n, v]); }; }
+	    function step(op) {
+	        if (f) throw new TypeError("Generator is already executing.");
+	        while (_) try {
+	            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+	            if (y = 0, t) op = [0, t.value];
+	            switch (op[0]) {
+	                case 0: case 1: t = op; break;
+	                case 4: _.label++; return { value: op[1], done: false };
+	                case 5: _.label++; y = op[1]; op = [0]; continue;
+	                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+	                default:
+	                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+	                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+	                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+	                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+	                    if (t[2]) _.ops.pop();
+	                    _.trys.pop(); continue;
+	            }
+	            op = body.call(thisArg, _);
+	        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+	        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+	    }
+	};
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Trending_1 = __webpack_require__(40);
+	var PostgreRepository_1 = __webpack_require__(32);
+	var Method_1 = __webpack_require__(9);
+	var route_1 = __webpack_require__(34);
+	var HalHandler_1 = __webpack_require__(35);
+	var __this;
+	var TrendingService = (function (_super) {
+	    __extends(TrendingService, _super);
+	    function TrendingService() {
+	        var _this = _super.call(this, Trending_1.default.RESOURCE_NAME) || this;
+	        __this = _this;
+	        return _this;
+	    }
+	    TrendingService.prototype.getResource = function () {
+	        return Trending_1.default;
+	    };
+	    TrendingService.prototype.getTrendings = function (req, res, next) {
+	        return __awaiter(this, void 0, void 0, function () {
+	            return __generator(this, function (_a) {
+	                HalHandler_1.default.process(__this, req, res, Trending_1.default);
+	                return [2 /*return*/];
+	            });
+	        });
+	    };
+	    return TrendingService;
+	}(PostgreRepository_1.default));
+	__decorate([
+	    route_1.default(Method_1.default.GET, ['/trending/:id', '/trending']),
+	    __metadata("design:type", Function),
+	    __metadata("design:paramtypes", [Object, Object, Object]),
+	    __metadata("design:returntype", Promise)
+	], TrendingService.prototype, "getTrendings", null);
+	exports.default = TrendingService;
+
 
 /***/ })
 /******/ ])));
