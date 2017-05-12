@@ -20,3 +20,12 @@ export function injectIdParams(req) {
         if (req.params[paramName]) req.query[paramName] = req.params[paramName]
     })
 }
+
+export function toQueryString(req) {
+    let queryString = '?'
+    Object.keys(req.query).forEach((val) => {
+        queryString += `${val}=${req.query[val]}&`
+    })
+    queryString = queryString.slice(0, -1)
+    return removeDuplicatedSlashes(queryString)
+}

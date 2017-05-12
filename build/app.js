@@ -45,7 +45,7 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 	__webpack_require__(1);
-	module.exports = __webpack_require__(38);
+	module.exports = __webpack_require__(39);
 
 
 /***/ }),
@@ -56,11 +56,11 @@
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Application_1 = __webpack_require__(2);
 	var ProfileService_1 = __webpack_require__(10);
-	var MessageService_1 = __webpack_require__(35);
+	var MessageService_1 = __webpack_require__(36);
 	var MapperProvider_1 = __webpack_require__(19);
 	var Message_mapper_1 = __webpack_require__(30);
-	var MessageSocialInfo_mapper_1 = __webpack_require__(36);
-	var PersonalInfo_mapper_1 = __webpack_require__(37);
+	var MessageSocialInfo_mapper_1 = __webpack_require__(37);
+	var PersonalInfo_mapper_1 = __webpack_require__(38);
 	var Profile_mapper_1 = __webpack_require__(31);
 	var Message_1 = __webpack_require__(28);
 	var MessageSocialInfo_1 = __webpack_require__(29);
@@ -68,7 +68,7 @@
 	var Profile_1 = __webpack_require__(11);
 	var port = process.env.APP_PORT;
 	var apiVersion = 2;
-	var host = 'http://myApiHost.com/';
+	var host = "http://localhost:3000/";
 	MapperProvider_1.default.add(Message_1.default.name, Message_mapper_1.default);
 	MapperProvider_1.default.add(MessageSocialInfo_1.default.name, MessageSocialInfo_mapper_1.default);
 	MapperProvider_1.default.add(PersonalInfo_1.default.name, PersonalInfo_mapper_1.default);
@@ -308,8 +308,8 @@
 	var Profile_1 = __webpack_require__(11);
 	var PostgreRepository_1 = __webpack_require__(32);
 	var Method_1 = __webpack_require__(9);
-	var route_1 = __webpack_require__(33);
-	var HalHandler_1 = __webpack_require__(34);
+	var route_1 = __webpack_require__(34);
+	var HalHandler_1 = __webpack_require__(35);
 	var __this;
 	var ProfileService = (function (_super) {
 	    __extends(ProfileService, _super);
@@ -515,7 +515,7 @@
 	     */
 	    Resource.prototype.toHal = function (isRoot) {
 	        return __awaiter(this, void 0, void 0, function () {
-	            var __this, hal, i, embeddedResource, service, res;
+	            var __this, hal, i, embeddedResource, service, response;
 	            return __generator(this, function (_a) {
 	                switch (_a.label) {
 	                    case 0:
@@ -541,8 +541,8 @@
 	                        service = Application_1.default.getServiceByName(embeddedResource.getResourceName());
 	                        return [4 /*yield*/, service.search(embeddedResource.getCriteria(), service.getResource())];
 	                    case 2:
-	                        res = _a.sent();
-	                        hal['_embedded'][embeddedResource.getName()] = res;
+	                        response = _a.sent();
+	                        hal['_embedded'][embeddedResource.getName()] = response.getResources();
 	                        _a.label = 3;
 	                    case 3:
 	                        i++;
@@ -626,6 +626,15 @@
 	    });
 	}
 	exports.injectIdParams = injectIdParams;
+	function toQueryString(req) {
+	    var queryString = '?';
+	    Object.keys(req.query).forEach(function (val) {
+	        queryString += val + "=" + req.query[val] + "&";
+	    });
+	    queryString = queryString.slice(0, -1);
+	    return removeDuplicatedSlashes(queryString);
+	}
+	exports.toQueryString = toQueryString;
 
 
 /***/ }),
@@ -770,11 +779,12 @@
 	    /**
 	     * A criteria object can be resolved and thus return a parametrized Postgre database query
 	     * @param tableName the name of the table where created query will be applied
-	     * @returns {{statement: string, values: Array}}
+	     * @returns {{statement: string, totalsStatement: string, values: Array}}
 	     */
 	    PostgreCriteria.prototype.resolve = function (tableName) {
 	        var __this = this;
 	        var statement = "SELECT * FROM " + tableName;
+	        var totalsStatement = "SELECT COUNT(*) FROM " + tableName;
 	        var whereStatement = "";
 	        var paginationStatement = "";
 	        var page;
@@ -805,9 +815,12 @@
 	        });
 	        whereStatement = whereStatement.substring(0, whereStatement.length - " AND ".length);
 	        whereStatement ? statement += " WHERE " + whereStatement : '';
+	        whereStatement ? totalsStatement += " WHERE " + whereStatement : '';
 	        paginationStatement ? statement += " " + paginationStatement + " " : '';
+	        paginationStatement ? totalsStatement += " " + paginationStatement + " " : '';
 	        statement = statement.toUpperCase();
-	        return { statement: statement, values: values };
+	        totalsStatement = totalsStatement.toUpperCase();
+	        return { statement: statement, totalsStatement: totalsStatement, values: values };
 	    };
 	    /**
 	     * Creates a criteria instance using an HTTP request object, and a resource instance
@@ -1368,6 +1381,7 @@
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var PostgreCriteria_1 = __webpack_require__(17);
+	var Response_1 = __webpack_require__(33);
 	var ApplicationException_1 = __webpack_require__(13);
 	var pool = __webpack_require__(22);
 	/**
@@ -1417,7 +1431,7 @@
 	     */
 	    PostgreRepository.prototype.search = function (criteria, resource) {
 	        return __awaiter(this, void 0, void 0, function () {
-	            var resolvedCriteria, res, _res_1;
+	            var resolvedCriteria, res, total, resources_1;
 	            return __generator(this, function (_a) {
 	                switch (_a.label) {
 	                    case 0:
@@ -1425,15 +1439,18 @@
 	                        return [4 /*yield*/, pool.query(resolvedCriteria.statement, resolvedCriteria.values)];
 	                    case 1:
 	                        res = _a.sent();
+	                        return [4 /*yield*/, pool.query(resolvedCriteria.totalsStatement, resolvedCriteria.values)];
+	                    case 2:
+	                        total = _a.sent();
 	                        if (res.rows.length === 0) {
 	                            throw new ApplicationException_1.default("Does not exist any " + this.getName() + " that matches given criteria");
 	                        }
 	                        else {
-	                            _res_1 = [];
+	                            resources_1 = [];
 	                            res.rows.forEach(function (row) {
-	                                _res_1.push(resource.create(row));
+	                                resources_1.push(resource.create(row));
 	                            });
-	                            return [2 /*return*/, _res_1];
+	                            return [2 /*return*/, new Response_1.default(resources_1, parseInt(total.rows[0].count))];
 	                        }
 	                        return [2 /*return*/];
 	                }
@@ -1456,6 +1473,28 @@
 
 /***/ }),
 /* 33 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Response = (function () {
+	    function Response(resources, total) {
+	        this.resources = resources;
+	        this.total = total;
+	    }
+	    Response.prototype.getResources = function () {
+	        return this.resources;
+	    };
+	    Response.prototype.getTotal = function () {
+	        return this.total;
+	    };
+	    return Response;
+	}());
+	exports.default = Response;
+
+
+/***/ }),
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1475,7 +1514,7 @@
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1516,15 +1555,16 @@
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var utils_1 = __webpack_require__(14);
+	var Application_1 = __webpack_require__(2);
 	var HalHandler = (function () {
 	    function HalHandler() {
 	    }
 	    /**
 	     * Given a list of HAL resources, creates a HAL collection of them
-	     * @param resources
+	     * @param resources the list of the resources to be added to the
 	     * @returns {{_embedded: {items: Array}, _links: {}}}
 	     */
-	    HalHandler.toHalCollection = function (resources) {
+	    HalHandler.toHalCollection = function (resources, total, req) {
 	        return __awaiter(this, void 0, void 0, function () {
 	            var halCollection, i, r;
 	            return __generator(this, function (_a) {
@@ -1534,7 +1574,12 @@
 	                            _embedded: {
 	                                items: []
 	                            },
-	                            _links: {},
+	                            _links: {
+	                                "total_results": total,
+	                                "page_size": parseInt(req.query['page_size']),
+	                                "total_pages": total / parseInt(req.query['page_size']) < 1 ? 1 : total / total / parseInt(req.query['page_size']),
+	                                "current_page": utils_1.removeDuplicatedSlashes(Application_1.default.HOST + "/v" + Application_1.default.API_VERSION + "/" + req.path + utils_1.toQueryString(req))
+	                            },
 	                        };
 	                        i = 0;
 	                        _a.label = 1;
@@ -1562,7 +1607,7 @@
 	     */
 	    HalHandler.process = function (service, req, res, resource) {
 	        return __awaiter(this, void 0, void 0, function () {
-	            var result, r, halCollection, err_1;
+	            var response, r, halCollection, err_1;
 	            return __generator(this, function (_a) {
 	                switch (_a.label) {
 	                    case 0:
@@ -1572,14 +1617,14 @@
 	                        _a.trys.push([1, 7, , 8]);
 	                        return [4 /*yield*/, service.searchByRequest(req, resource)];
 	                    case 2:
-	                        result = _a.sent();
+	                        response = _a.sent();
 	                        if (!req.params.id) return [3 /*break*/, 4];
-	                        return [4 /*yield*/, result[0].toHal(true)];
+	                        return [4 /*yield*/, response.getResources()[0].toHal(true)];
 	                    case 3:
 	                        r = _a.sent();
 	                        res.send(r);
 	                        return [3 /*break*/, 6];
-	                    case 4: return [4 /*yield*/, HalHandler.toHalCollection(result)];
+	                    case 4: return [4 /*yield*/, HalHandler.toHalCollection(response.getResources(), response.getTotal(), req)];
 	                    case 5:
 	                        halCollection = _a.sent();
 	                        res.send(halCollection);
@@ -1600,7 +1645,7 @@
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1662,8 +1707,8 @@
 	var Message_1 = __webpack_require__(28);
 	var PostgreRepository_1 = __webpack_require__(32);
 	var Method_1 = __webpack_require__(9);
-	var route_1 = __webpack_require__(33);
-	var HalHandler_1 = __webpack_require__(34);
+	var route_1 = __webpack_require__(34);
+	var HalHandler_1 = __webpack_require__(35);
 	var __this;
 	/**
 	 * Service for Message resource
@@ -1711,7 +1756,7 @@
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -1749,7 +1794,7 @@
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -1783,10 +1828,10 @@
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	const root = __webpack_require__(39).path;
+	const root = __webpack_require__(40).path;
 	
 	module.exports = {
 	    entry: `${root}/src/start.ts`,
@@ -1818,7 +1863,7 @@
 	};
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports) {
 
 	module.exports = require("app-root-path");

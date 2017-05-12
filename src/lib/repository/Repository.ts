@@ -1,4 +1,5 @@
 import Criteria from '../criteria/Criteria'
+import Response from './Response'
 
 interface Repository<T> {
 
@@ -10,12 +11,12 @@ interface Repository<T> {
     /**
      * Returns a collection of resources filtered by a provided criteria
      */
-    search(criteria: Criteria, resource): Promise<T[]>
+    search(criteria: Criteria, resource): Promise<Response<T[]>>
 
     /**
      * Returns a collection of resources filtered by a provided HTTP request
      */
-    searchByRequest(request:any, resource): Promise<T[]>
+    searchByRequest(request:any, resource): Promise<Response<T[]>>
 
     /**
      * Creates a resource instance

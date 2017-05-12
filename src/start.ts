@@ -15,7 +15,7 @@ import Profile from './resource/Profile'
 
 const port = process.env.APP_PORT
 const apiVersion = 2
-const host = 'http://myApiHost.com/'
+const host = `http://localhost:3000/`
 
 
 MapperProvider.add(Message.name, MessageMapper)

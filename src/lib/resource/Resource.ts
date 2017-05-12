@@ -81,8 +81,8 @@ abstract class Resource<T> implements Factory<T>{
             for (var i = 0; i < __this.embeddeds().length; i++) {
                 let embeddedResource = __this.embeddeds()[i]
                 let service = Application.getServiceByName(embeddedResource.getResourceName())
-                let res = await service.search(embeddedResource.getCriteria(), service.getResource())
-                hal['_embedded'][embeddedResource.getName()] = res
+                let response = await service.search(embeddedResource.getCriteria(), service.getResource())
+                hal['_embedded'][embeddedResource.getName()] = response.getResources()
             }
         }
 

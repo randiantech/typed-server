@@ -30,11 +30,12 @@ export default class PostgreCriteria implements Criteria {
     /**
      * A criteria object can be resolved and thus return a parametrized Postgre database query
      * @param tableName the name of the table where created query will be applied
-     * @returns {{statement: string, values: Array}}
+     * @returns {{statement: string, totalsStatement: string, values: Array}}
      */
-    resolve(tableName?: string): { statement: string, values: any } {
+    resolve(tableName: string): { statement: string, totalsStatement: string, values: any } {
         let __this = this
         let statement = `SELECT * FROM ${tableName}`
+        let totalsStatement = `SELECT COUNT(*) FROM ${tableName}`
         let whereStatement = ``
         let paginationStatement = ``
         let page
@@ -69,10 +70,13 @@ export default class PostgreCriteria implements Criteria {
 
         whereStatement = whereStatement.substring(0, whereStatement.length - ` AND `.length)
         whereStatement ? statement += ` WHERE ${whereStatement}` : ''
+        whereStatement ? totalsStatement += ` WHERE ${whereStatement}` : ''
         paginationStatement ? statement += ` ${paginationStatement} ` : ''
+        paginationStatement ? totalsStatement += ` ${paginationStatement} ` : ''
         statement = statement.toUpperCase()
+        totalsStatement = totalsStatement.toUpperCase()
 
-        return { statement, values }
+        return { statement, totalsStatement, values }
     }
 
     /**

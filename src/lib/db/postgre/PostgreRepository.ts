@@ -1,6 +1,7 @@
 import Resource from '../../resource/Resource'
 import PostgreCriteria from './PostgreCriteria'
 import Repository from '../../repository/Repository'
+import Response from '../../repository/Response'
 import ApplicationException from '../../error/ApplicationException'
 const pool = require('./utils.postgre')
 
@@ -33,7 +34,7 @@ abstract class PostgreRepository<T extends Resource<T>> implements Repository<T>
      * @param resource the resource
      * @returns {T[]} A future list of T type resources obtained from repository through a criteria generate query
      */
-    async searchByRequest(request: any, resource): Promise<T[]> {
+    async searchByRequest(request: any, resource): Promise<Response<T[]>> {
         let criteria = PostgreCriteria.create(request, resource)
         let res = await this.search(criteria, resource)
         return res
@@ -45,18 +46,19 @@ abstract class PostgreRepository<T extends Resource<T>> implements Repository<T>
      * @param resource the resource
      * @returns {Array} list of future resources of type T obtained from repository through a criteria generated query
      */
-    async search(criteria: PostgreCriteria, resource): Promise<T[]> {
+    async search(criteria: PostgreCriteria, resource: T): Promise<Response<T[]>> {
         let resolvedCriteria
         resolvedCriteria = criteria.resolve(this.getName())
         let res = await pool.query(resolvedCriteria.statement, resolvedCriteria.values)
+        let total = await pool.query(resolvedCriteria.totalsStatement, resolvedCriteria.values)
         if (res.rows.length === 0) {
             throw new ApplicationException(`Does not exist any ${this.getName()} that matches given criteria`)
         } else {
-            let _res = []
+            let resources = []
             res.rows.forEach((row) => {
-                _res.push(resource.create(row))
+                resources.push(resource.create(row))
             })
-            return _res
+            return new Response<T[]>(resources, parseInt(total.rows[0].count))
         }
     }
 
