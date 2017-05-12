@@ -1,17 +1,31 @@
 import Resource from '../lib/resource/Resource'
+import PersonalInfo from './PersonalInfo'
+import ApplicationException from '../lib/error/ApplicationException'
 import EmbeddedResource from '../lib/resource/EmbeddedResource'
-import PersonalInfo from './common/PersonalInfo'
-import AppLogEntry from '../lib/error/AppLogEntry'
-import AppLogType from '../lib/error/AppLogType'
+import PostgreCriteria from '../lib/db/postgre/PostgreCriteria'
+import QueryTuple from '../lib/resource/QueryTuple'
+import QueryTupleOperation from '../lib/resource/QueryTupleOperation'
+import Message from './Message'
+const mapper = require('./mappers/Profile.mapper')
 
+/**
+ * Profile Resource definition
+ * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
+ */
 export default class Profile extends Resource<Profile> {
 
+    /**
+     * @type {string} the name of the resource
+     */
     public static RESOURCE_NAME: string = 'profile';
+
+
     private personalInfo: PersonalInfo;
 
     /**
      * constructor
      * @param personalInfo personal information of the profile
+     * @param id the id of the resource
      */
     constructor(personalInfo: PersonalInfo, id?: string) {
         super(Profile.RESOURCE_NAME, id);
@@ -19,42 +33,46 @@ export default class Profile extends Resource<Profile> {
         this.personalInfo = personalInfo;
     }
 
-    transform(obj: any): Profile {
-        return Profile.transform(obj)
-    }
-
-    static transform(obj: any): Profile {
-        return new Profile(PersonalInfo.transform(obj), obj.id)
-    }
-
-    static validate(obj: any) {
-        return Profile.validate(obj)
+    /**
+     * Attempts to create a Profile object from given plain javascript object input
+     * @param obj the object from which it will be tried to be constructed an instance of Profile class
+     * @returns {Profile} instance of Profile class
+     */
+    create(obj: any): Profile {
+        return Profile.create(obj)
     }
 
     /**
-     * Validates whether or not supplied object contains valid parameters to contruct a Profile instance
+     * Attempts to create a Profile object from given plain javascript object input
+     * @param obj the object from which it will be tried to be constructed an instance of Profile class
+     * @returns {Profile} instance of Profile class
+     */
+    static create(obj: any): Profile {
+        return new Profile(PersonalInfo.create(obj), obj.id)
+    }
+
+    /**
+     * Validates whether or not supplied object contains valid parameters to construct a Profile instance
      * @param obj object to be validated
      */
     validate(obj: any) {
         try {
             PersonalInfo.validate(obj.personalInfo)
         } catch (err) {
-            throw new AppLogEntry(AppLogType.ERROR, `Error transforming Profile instance: Provided input: ${obj}`, err)
+            throw new ApplicationException(`Error creating Profile instance: Provided input: ${obj}`, err)
         }
-    }
-
-    embeddeds(): EmbeddedResource[] {
-        return []
     }
 
     /**
-     * Given the name of a property, returns its database type
-     * @param propertyName the name of the property to which type will be resolved 
+     * Defines the list of embedded resources of the Profile resource
+     * @returns {EmbeddedResource[]} list of EmbeddedResource
      */
-    static getPropertyType(propertyName: string): string {
-        if(propertyName.startsWith('personalInfo')){
-            propertyName = propertyName.split('.')[0]
-            return PersonalInfo.getPropertyType(propertyName)
-        }
+    embeddeds(): EmbeddedResource[] {
+        return [
+            new EmbeddedResource(
+                'message',
+                Message.RESOURCE_NAME,
+                new PostgreCriteria([new QueryTuple('profileId', this.getId(), 'bigint', QueryTupleOperation.EQUALS)]))
+        ]
     }
 }

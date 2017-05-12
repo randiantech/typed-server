@@ -12,30 +12,58 @@ var _services = {}
 const app = express()
 
 /**
- * Application
+ * Application Bootstrap class in charge of creating the http server
  * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
  */
 export default class Application {
 
+    /**
+     * Default Application Port to be used in case specific value is not provided
+     */
     public static DEFAULT_PORT = 3000
+
+    /**
+     * Default page number to be used in case specific page value is not provided
+     */
     public static DEFAULT_PAGE = 1
+
+    /**
+     * Default page size number to be used in case specific page size value is not provided
+     */
     public static DEFAULT_PAGE_SIZE = 50
-    static API_VERSION
-    static HOST
+
+    /**
+     * API Version. Prefixed the application routes
+     */
+    public static API_VERSION
+
+    /**
+     * API Host. Used to construct URL strings on resource representations
+     */
+    public static HOST
+
+    /**
+     * List of services hosted by server
+     */
     services: any[]
 
-    constructor(services: any[], port?: number, version?:number, host?:string) {
+    /**
+     * 
+     */
+    constructor(services: any[], port?: number, version?: number, host?: string) {
         version ? Application.API_VERSION = version : 'v1'
         host ? Application.HOST = host : ''
-        
+
+        //TODO This middlewares would be optional / configurable
         app.use(logger('dev'));
         app.use(bodyParser.json());
         app.use(bodyParser.urlencoded({ extended: false }));
         app.use(cookieParser());
-        
+        //TODO This middlewares would be optional / configurable
+
         app.use(this.injectPaginationParams)
-        
-        app.use(RouterFactory.getRouter());
+
+        app.use(`/v${version}`, RouterFactory.getRouter());
         app.set('port', port || Application.DEFAULT_PORT);
 
         const server = http.createServer(app);
@@ -45,7 +73,7 @@ export default class Application {
             const addr = server.address();
             const bind = (typeof addr === 'string' ? `pipe ${addr}` : `port ${addr.port}`);
         });
-        
+
         services.forEach((service) => {
             _services[service.getName()] = service
         })
@@ -57,7 +85,7 @@ export default class Application {
         return next()
     }
 
-    public static getServiceByName(name:string){
+    public static getServiceByName(name: string) {
         return _services[name]
     }
 }

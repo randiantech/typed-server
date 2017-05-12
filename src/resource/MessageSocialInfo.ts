@@ -1,7 +1,10 @@
-import Resource from '../../lib/resource/Resource'
-import Transformable from '../../lib/repository/Transformable'
+import Factory from '../lib/common/Factory'
 
-export default class MessageSocialInfo implements Transformable<MessageSocialInfo> {
+/**
+ * MessageSocialInfo object
+ * //TODO This is not a resource indeed, it would be somewhere else to clearly state that
+ */
+export default class MessageSocialInfo implements Factory<MessageSocialInfo> {
 
     private likeCounter: number;
     private loveCounter: number;
@@ -33,11 +36,21 @@ export default class MessageSocialInfo implements Transformable<MessageSocialInf
         this.reportCounter = reportCounter;
     }
 
-    transform(obj: any): MessageSocialInfo {
-        return MessageSocialInfo.transform(obj)
+    /**
+     * Attempts to create a MessageSocialInfo object from given plain javascript object input
+     * @param obj the object from which it will be tried to be constructed an instance of MessageSocialInfo class
+     * @returns {MessageSocialInfo} instance of MessageSocialInfo class
+     */
+    create(obj: any): MessageSocialInfo {
+        return MessageSocialInfo.create(obj)
     }
 
-    static transform(obj: any): MessageSocialInfo {
+    /**
+     * Attempts to create a MessageSocialInfo object from given plain javascript object input
+     * @param obj the object from which it will be tried to be constructed an instance of MessageSocialInfo class
+     * @returns {MessageSocialInfo} instance of MessageSocialInfo class
+     */
+    static create(obj: any): MessageSocialInfo {
         return new MessageSocialInfo(
             parseInt(obj.likecounter), 
             parseInt(obj.lovecounter), 
@@ -54,17 +67,5 @@ export default class MessageSocialInfo implements Transformable<MessageSocialInf
 
     static validate(obj: any) {
         return
-    }
-
-    static getPropertyType(propertyName: string): string {
-        switch(propertyName.toLowerCase()) {
-            case 'likecounter': return 'int'
-            case 'lovecounter': return 'int'
-            case 'funcounter': return 'int'
-            case 'wowcounter': return 'int'
-            case 'sadcounter': return 'int'
-            case 'angrycounter': return 'int'
-            case 'reportcounter': return 'int'
-        }
     }
 }

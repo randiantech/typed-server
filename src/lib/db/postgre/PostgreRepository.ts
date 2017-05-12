@@ -1,51 +1,63 @@
 import Resource from '../../resource/Resource'
 import PostgreCriteria from './PostgreCriteria'
 import Repository from '../../repository/Repository'
-import AppLogEntry from '../../error/AppLogEntry'
-import AppLogType from '../../error/AppLogType'
+import ApplicationException from '../../error/ApplicationException'
 const pool = require('./utils.postgre')
 
 /**
- * PostgreSql Repository
+ * PostgreSql Repository. Used to provide resource services with operations to interact with a Postgre database
  * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
  */
 abstract class PostgreRepository<T extends Resource<T>> implements Repository<T> {
 
     name: string;
 
+    /**
+     * constructor
+     * @param name the name of the resource
+     */
     constructor(name) {
         this.name = name
     }
 
+    /**
+     * @returns {string} the name of the resource
+     */
     getName(): string {
         return this.name
     }
 
-    async searchByRequest(request:any, mapper:any): Promise<T[]> {
-        let criteria = PostgreCriteria.create(request, mapper)
-        let res = await this.search(criteria)
+    /**
+     * Given an HTTP request and a resource, returns the response to a given query (resolved using a proper criteria)
+     * @param request the HTTP request used to create the criteria that will be used to generate the query to be executed
+     * @param resource the resource
+     * @returns {T[]} A future list of T type resources obtained from repository through a criteria generate query
+     */
+    async searchByRequest(request: any, resource): Promise<T[]> {
+        let criteria = PostgreCriteria.create(request, resource)
+        let res = await this.search(criteria, resource)
         return res
     }
 
-    async search(criteria: PostgreCriteria): Promise<T[]> {
-       let __this = this
-       let resolvedCriteria
-       try {
-            resolvedCriteria = criteria.resolve(this.getName())
-            let res = await pool.query(resolvedCriteria.statement, resolvedCriteria.values)
-            if (res.rows.length === 0) {
-                throw new AppLogEntry(AppLogType.INFO, `Does not exist any ${this.getName()}`)
-            } else {
-                let _res = []
-                let rows = res['rows']
-                rows.forEach((row) => {
-                    _res.push(__this.transform(row))
-                })
-                return _res
-            }
-        } catch (err) {
-            throw new AppLogEntry(AppLogType.ERROR, `Failed to execute PostgreRepository.search(${JSON.stringify(resolvedCriteria)})`)
-        } 
+    /**
+     * Given a criteria and a resource, executes a search query
+     * @param criteria criteria object used to generate the query to be executed
+     * @param resource the resource
+     * @returns {Array} list of future resources of type T obtained from repository through a criteria generated query
+     */
+    async search(criteria: PostgreCriteria, resource): Promise<T[]> {
+        let resolvedCriteria
+        resolvedCriteria = criteria.resolve(this.getName())
+        let res = await pool.query(resolvedCriteria.statement, resolvedCriteria.values)
+        if (res.rows.length === 0) {
+            throw new ApplicationException(`Does not exist any ${this.getName()} that matches given criteria`)
+        } else {
+            let _res = []
+            res.rows.forEach((row) => {
+                _res.push(resource.create(row))
+            })
+            return _res
+        }
     }
 
     create(instance: T): T {
@@ -59,10 +71,6 @@ abstract class PostgreRepository<T extends Resource<T>> implements Repository<T>
     delete(id: string): T {
         throw new Error('Method not implemented.');
     }
-
-    abstract transform(obj: any): T
-
-    abstract validate(obj: any)
 }
 
 export default PostgreRepository

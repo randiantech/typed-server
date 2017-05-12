@@ -1,5 +1,11 @@
 import QueryTupleOperation from '../resource/QueryTupleOperation'
 
+/**
+ * Given an object key, extract the corresponding operation identifier.
+ * In example, the key is eq_<KEY_NAME>, it extracts the identifier (_eq) and returns the corresponding operation
+ * @param key the key from which the operation identifier will be analysed
+ * @returns {QueryTupleOperation} A QueryTupleOperation (in example, EQUALS)
+ */
 export function resolveOperation(key) {
   let _containsPrefix = (key) => {
     return !key || key[2] != '_' || key.length < 3

@@ -12,8 +12,8 @@ export function removeDuplicatedSlashes(url: string) {
  * Injects named parameters as query params
  * @param req HTTP request
  * 
- * //TODO this is not optimal at all. I need to somehow implement a decorator that executes
- * //each and every time before a @route annotated method.
+ * //TODO this is not ideal. I need to somehow implement a decorator that executes
+ * //TODO each and every time before a @route annotated method.
  */
 export function injectIdParams(req) {
     Object.keys(req.params).forEach((paramName) => {

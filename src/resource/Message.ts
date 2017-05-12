@@ -1,13 +1,21 @@
 import Resource from '../lib/resource/Resource'
 import EmbeddedResource from '../lib/resource/EmbeddedResource'
 import PostgreCriteria from '../lib/db/postgre/PostgreCriteria'
-import MessageSocialInfo from './common/MessageSocialInfo'
+import MessageSocialInfo from './MessageSocialInfo'
 import QueryTuple from '../lib/resource/QueryTuple'
 import QueryTupleOperation from '../lib/resource/QueryTupleOperation'
 import Profile from './Profile'
+const mapper = require('./mappers/Message.mapper')
 
+/**
+ * Message Resource definition
+ * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
+ */
 export default class Message extends Resource<Message> {
 
+    /**
+     * The name of the resource. This field is particularly important to link the corresponding resource mapper
+     */
     public static RESOURCE_NAME: string = 'message';
 
     private value: string;
@@ -44,36 +52,35 @@ export default class Message extends Resource<Message> {
         ]
     }
 
-    transform(obj: any): Message {
-        return Message.transform(obj)
+    /**
+     * Given an object, attempts to construct a Message instance
+     * @params obj Plain Javascript Object from which this factory method will try to construct an instance of a Message
+     */
+    create(obj: any): Message {
+        return Message.create(obj)
     }
 
-    static transform(obj: any): Message {
-        return new Message(obj.value, obj.date, MessageSocialInfo.transform(obj), obj.profileid, obj.id)
+    /**
+     * Given an object, attempts to construct a Message instance
+     * @params obj Plain Javascript Object from which this factory method will try to construct an instance of a Message
+     */
+    static create(obj: any): Message {
+        return new Message(obj.value, obj.date, MessageSocialInfo.create(obj), obj.profileid, obj.id)
     }
-
+    
+    /**
+     * Given an object, validates that the supplied parameters are valid to construct an instance
+     * @params obj Plain Javascript Object Message object
+     */
     validate(obj: any) {
         return Message.validate(obj)
     }
 
+    /**
+     * Given an object, validates that the supplied parameters are valid to construct an instance
+     * @params obj Plain Javascript Object Message object
+     */
     static validate(obj: any) {
         return
-    }
-
-    /**
-     * Given the name of a property, returns its database type
-     * @param propertyName the name of the property to which type will be resolved 
-     */
-    static getPropertyType(propertyName: string): string {
-        if(propertyName.startsWith('messageSocialInfo')){
-            propertyName = propertyName.split('.')[0]
-            return MessageSocialInfo.getPropertyType(propertyName)
-        } 
-
-        switch(propertyName.toLocaleLowerCase()) {
-            case 'id': return 'bigint'
-            case 'date': return 'bigint'
-            case 'profileid': return 'bigint'
-        }
     }
 }

@@ -1,24 +1,37 @@
 import Criteria from '../../criteria/Criteria'
-import AppLogEntry from '../../error/AppLogEntry'
-import AppLogType from '../../error/AppLogType'
-import Transformable from '../../repository/Transformable'
 import QueryTuple from '../../resource/QueryTuple'
-import QueryTupleOperation from '../../resource/QueryTupleOperation'
+import MapperProvider from '../../mapper/MapperProvider'
 import { resolveOperation } from '../../utils/utils.db'
 import { resolveTupleOperation } from './utils.postgre'
 
+/**
+ * Implementation of a Criteria for Postgre databases. A criteria is capable to resolve to a parametrized query through
+ * QueryTuples.
+ */
 export default class PostgreCriteria implements Criteria {
 
     tuples: QueryTuple[]
 
+    /**
+     * constructor
+     * @param tuples list of tuples used to create a criteria
+     */
     constructor(tuples: QueryTuple[]) {
         this.tuples = tuples
     }
 
+    /**
+     * @returns {QueryTuple[]} list of tuples
+     */
     getTuples(): QueryTuple[] {
         return this.tuples
     }
 
+    /**
+     * A criteria object can be resolved and thus return a parametrized Postgre database query
+     * @param tableName the name of the table where created query will be applied
+     * @returns {{statement: string, values: Array}}
+     */
     resolve(tableName?: string): { statement: string, values: any } {
         let __this = this
         let statement = `SELECT * FROM ${tableName}`
@@ -62,15 +75,29 @@ export default class PostgreCriteria implements Criteria {
         return { statement, values }
     }
 
-    create(request: any, mapper: any) {
-        return PostgreCriteria.create(request, mapper)
+    /**
+     * Creates a criteria instance using an HTTP request object, and a resource instance
+     * @param request the HTTP request object from which data will be extracted to create criteria tuples
+     * @param resource the resource used to resolve its corresponding mapper
+     * @returns {PostgreCriteria} A postgre database criteria object
+     */
+    create(request: any, resource: any) {
+        return PostgreCriteria.create(request, resource)
     }
 
-    static create(request: any, mapper: any) {
+    /**
+     * Creates a criteria instance using an HTTP request object, and a resource instance
+     * @param request the HTTP request object from which data will be extracted to create criteria tuples
+     * @param resource the resource used to resolve its corresponding mapper
+     * @returns {PostgreCriteria} A postgre database criteria object
+     */
+    static create(request: any, resource) {
         let tuples = []
 
         Object.keys(request.query).forEach((key) => {
-            tuples.push(new QueryTuple(key, request.query[key], mapper(key), resolveOperation(key)))
+            let mapping = MapperProvider.get(resource.name, key)
+            let value = request.query[key]
+            tuples.push(new QueryTuple(mapping.name, value, mapping.type, resolveOperation(key)))
         })
 
         return new PostgreCriteria(tuples)

@@ -4,6 +4,11 @@ const props = require('../../utils/utils.props');
 const pg = require('pg')
 const pool = new pg.Pool(props().postgresql);
 
+/**
+ * Given a QueryTupleOperation, resolves to the corresponding Postgres operator
+ * @param op QueryTupleOperation
+ * @returns {any} the corresponding operator to be used on query
+ */
 export function resolveTupleOperation(op: QueryTupleOperation) {
   switch (op) {
     //TODO Do the resolution for contains! :)

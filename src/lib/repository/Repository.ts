@@ -1,8 +1,6 @@
-import Transformable from './Transformable'
-import Resource from '../resource/Resource'
 import Criteria from '../criteria/Criteria'
 
-interface Repository<T> extends Transformable<T> {
+interface Repository<T> {
 
     /**
      * Gets Repository Name
@@ -12,12 +10,12 @@ interface Repository<T> extends Transformable<T> {
     /**
      * Returns a collection of resources filtered by a provided criteria
      */
-    search(criteria: Criteria): Promise<T[]>
+    search(criteria: Criteria, resource): Promise<T[]>
 
     /**
      * Returns a collection of resources filtered by a provided HTTP request
      */
-    searchByRequest(request:any, mapper:any): Promise<T[]>
+    searchByRequest(request:any, resource): Promise<T[]>
 
     /**
      * Creates a resource instance

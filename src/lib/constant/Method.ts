@@ -1,3 +1,6 @@
+/**
+ * List of HTTP methods
+ */
 export enum Method {
     GET,
     PUT,
