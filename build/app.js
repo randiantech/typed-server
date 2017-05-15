@@ -45,7 +45,7 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 	__webpack_require__(1);
-	module.exports = __webpack_require__(41);
+	module.exports = __webpack_require__(42);
 
 
 /***/ }),
@@ -57,18 +57,18 @@
 	var Application_1 = __webpack_require__(2);
 	var ProfileService_1 = __webpack_require__(10);
 	var MessageService_1 = __webpack_require__(36);
-	var TrendingService_1 = __webpack_require__(43);
-	var MapperProvider_1 = __webpack_require__(19);
+	var TrendingService_1 = __webpack_require__(37);
+	var MapperProvider_1 = __webpack_require__(20);
 	var Message_mapper_1 = __webpack_require__(30);
-	var Trending_mapper_1 = __webpack_require__(37);
-	var MessageSocialInfo_mapper_1 = __webpack_require__(38);
-	var PersonalInfo_mapper_1 = __webpack_require__(39);
+	var Trending_mapper_1 = __webpack_require__(39);
+	var MessageSocialInfo_mapper_1 = __webpack_require__(40);
+	var PersonalInfo_mapper_1 = __webpack_require__(41);
 	var Profile_mapper_1 = __webpack_require__(31);
 	var Message_1 = __webpack_require__(28);
 	var MessageSocialInfo_1 = __webpack_require__(29);
 	var PersonalInfo_1 = __webpack_require__(15);
 	var Profile_1 = __webpack_require__(11);
-	var Trending_1 = __webpack_require__(40);
+	var Trending_1 = __webpack_require__(38);
 	var port = process.env.APP_PORT;
 	var apiVersion = 2;
 	var host = "http://localhost:3000/";
@@ -366,7 +366,7 @@
 	var EmbeddedResource_1 = __webpack_require__(16);
 	var PostgreCriteria_1 = __webpack_require__(17);
 	var QueryTuple_1 = __webpack_require__(18);
-	var QueryTupleOperation_1 = __webpack_require__(21);
+	var QueryTupleOperation_1 = __webpack_require__(19);
 	var Message_1 = __webpack_require__(28);
 	var mapper = __webpack_require__(31);
 	/**
@@ -759,8 +759,9 @@
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var QueryTuple_1 = __webpack_require__(18);
-	var MapperProvider_1 = __webpack_require__(19);
-	var utils_db_1 = __webpack_require__(20);
+	var QueryTupleOperation_1 = __webpack_require__(19);
+	var MapperProvider_1 = __webpack_require__(20);
+	var utils_db_1 = __webpack_require__(21);
 	var utils_postgre_1 = __webpack_require__(22);
 	/**
 	 * Implementation of a Criteria for Postgre databases. A criteria is capable to resolve to a parametrized query through
@@ -812,7 +813,9 @@
 	                    break;
 	                default:
 	                    values.push(tuple.fieldValue);
-	                    whereStatement += tuple.fieldName + "::" + tuple.fieldType + utils_postgre_1.resolveTupleOperation(tuple.operation) + "$" + fieldPosition;
+	                    var operation = utils_postgre_1.resolveTupleOperation(tuple.operation);
+	                    tuple.operation === QueryTupleOperation_1.default.CONTAINS ? tuple.fieldValue = "%" + tuple.fieldValue + "%" : '';
+	                    whereStatement += tuple.fieldName + "::" + tuple.fieldType + " " + utils_postgre_1.resolveTupleOperation(tuple.operation) + " $" + fieldPosition;
 	                    whereStatement += " AND ";
 	                    break;
 	            }
@@ -844,7 +847,7 @@
 	    PostgreCriteria.create = function (request, resource) {
 	        var tuples = [];
 	        Object.keys(request.query).forEach(function (key) {
-	            var mapping = MapperProvider_1.default.get(resource.name, key);
+	            var mapping = MapperProvider_1.default.get(resource.name, utils_db_1.resolveKey(key));
 	            var value = request.query[key];
 	            tuples.push(new QueryTuple_1.default(mapping.name, value, mapping.type, utils_db_1.resolveOperation(key)));
 	        });
@@ -914,6 +917,26 @@
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
+	/**
+	 * List of QueryTuple operations. Used to determine the type of requested query
+	 * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
+	 */
+	var QueryTupleOperation;
+	(function (QueryTupleOperation) {
+	    QueryTupleOperation[QueryTupleOperation["EQUALS"] = 0] = "EQUALS";
+	    QueryTupleOperation[QueryTupleOperation["GREATER_THAN"] = 1] = "GREATER_THAN";
+	    QueryTupleOperation[QueryTupleOperation["LESSER_THAN"] = 2] = "LESSER_THAN";
+	    QueryTupleOperation[QueryTupleOperation["CONTAINS"] = 3] = "CONTAINS";
+	})(QueryTupleOperation = exports.QueryTupleOperation || (exports.QueryTupleOperation = {}));
+	exports.default = QueryTupleOperation;
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
 	var mappers = {};
 	/**
 	 * Class responsible of handling resource property mapper. A Mapper is a <RESOURCE_NAME>.mapper.ts file that
@@ -975,12 +998,12 @@
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var QueryTupleOperation_1 = __webpack_require__(21);
+	var QueryTupleOperation_1 = __webpack_require__(19);
 	/**
 	 * Given an object key, extract the corresponding operation identifier.
 	 * In example, the key is eq_<KEY_NAME>, it extracts the identifier (_eq) and returns the corresponding operation
@@ -988,12 +1011,9 @@
 	 * @returns {QueryTupleOperation} A QueryTupleOperation (in example, EQUALS)
 	 */
 	function resolveOperation(key) {
-	    var _containsPrefix = function (key) {
-	        return !key || key[2] != '_' || key.length < 3;
-	    };
-	    if (!_containsPrefix(key))
+	    if (!containsOperationPrefix(key))
 	        return QueryTupleOperation_1.default.EQUALS;
-	    var opPrefix = key.substring(0, 3).toLowerCase();
+	    var opPrefix = key.substring(0, 2).toLowerCase();
 	    switch (opPrefix) {
 	        case 'eq': return QueryTupleOperation_1.default.EQUALS;
 	        case 'gt': return QueryTupleOperation_1.default.GREATER_THAN;
@@ -1003,26 +1023,19 @@
 	    }
 	}
 	exports.resolveOperation = resolveOperation;
-
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	/**
-	 * List of QueryTuple operations. Used to determine the type of requested query
-	 * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
-	 */
-	var QueryTupleOperation;
-	(function (QueryTupleOperation) {
-	    QueryTupleOperation[QueryTupleOperation["EQUALS"] = 0] = "EQUALS";
-	    QueryTupleOperation[QueryTupleOperation["GREATER_THAN"] = 1] = "GREATER_THAN";
-	    QueryTupleOperation[QueryTupleOperation["LESSER_THAN"] = 2] = "LESSER_THAN";
-	    QueryTupleOperation[QueryTupleOperation["CONTAINS"] = 3] = "CONTAINS";
-	})(QueryTupleOperation = exports.QueryTupleOperation || (exports.QueryTupleOperation = {}));
-	exports.default = QueryTupleOperation;
+	function containsOperationPrefix(key) {
+	    return key.startsWith('eq_') || key.startsWith('gt_') || key.startsWith('lt_') || key.startsWith('ct_');
+	}
+	exports.containsOperationPrefix = containsOperationPrefix;
+	function resolveKey(key) {
+	    if (containsOperationPrefix(key)) {
+	        return key.substring(3, key.length);
+	    }
+	    else {
+	        return key;
+	    }
+	}
+	exports.resolveKey = resolveKey;
 
 
 /***/ }),
@@ -1031,7 +1044,7 @@
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var QueryTupleOperation_1 = __webpack_require__(21);
+	var QueryTupleOperation_1 = __webpack_require__(19);
 	var props = __webpack_require__(23);
 	var pg = __webpack_require__(27);
 	var pool = new pg.Pool(props().postgresql);
@@ -1042,8 +1055,7 @@
 	 */
 	function resolveTupleOperation(op) {
 	    switch (op) {
-	        //TODO Do the resolution for contains! :)
-	        case QueryTupleOperation_1.default.CONTAINS: return '';
+	        case QueryTupleOperation_1.default.CONTAINS: return 'LIKE';
 	        case QueryTupleOperation_1.default.EQUALS: return '=';
 	        case QueryTupleOperation_1.default.GREATER_THAN: return '>';
 	        case QueryTupleOperation_1.default.LESSER_THAN: return '<';
@@ -1168,7 +1180,7 @@
 	var PostgreCriteria_1 = __webpack_require__(17);
 	var MessageSocialInfo_1 = __webpack_require__(29);
 	var QueryTuple_1 = __webpack_require__(18);
-	var QueryTupleOperation_1 = __webpack_require__(21);
+	var QueryTupleOperation_1 = __webpack_require__(19);
 	var Profile_1 = __webpack_require__(11);
 	var mapper = __webpack_require__(30);
 	/**
@@ -1761,108 +1773,101 @@
 
 /***/ }),
 /* 37 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = {
-	    "id": {
-	        "type": "bigint",
-	        "name": "id"
-	    },
-	    "image": {
-	        "type": "text",
-	        "name": "image"
-	    },
-	    "title": {
-	        "type": "text",
-	        "name": "title"
-	    },
-	    "location": {
-	        "type": "text",
-	        "name": "location"
-	    },
-	    "fans": {
-	        "type": "bigint",
-	        "name": "fans"
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+	        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+	        step((generator = generator.apply(thisArg, _arguments || [])).next());
+	    });
+	};
+	var __generator = (this && this.__generator) || function (thisArg, body) {
+	    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+	    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+	    function verb(n) { return function (v) { return step([n, v]); }; }
+	    function step(op) {
+	        if (f) throw new TypeError("Generator is already executing.");
+	        while (_) try {
+	            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+	            if (y = 0, t) op = [0, t.value];
+	            switch (op[0]) {
+	                case 0: case 1: t = op; break;
+	                case 4: _.label++; return { value: op[1], done: false };
+	                case 5: _.label++; y = op[1]; op = [0]; continue;
+	                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+	                default:
+	                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+	                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+	                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+	                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+	                    if (t[2]) _.ops.pop();
+	                    _.trys.pop(); continue;
+	            }
+	            op = body.call(thisArg, _);
+	        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+	        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
 	    }
 	};
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Trending_1 = __webpack_require__(38);
+	var PostgreRepository_1 = __webpack_require__(32);
+	var Method_1 = __webpack_require__(9);
+	var route_1 = __webpack_require__(34);
+	var HalHandler_1 = __webpack_require__(35);
+	var __this;
+	var TrendingService = (function (_super) {
+	    __extends(TrendingService, _super);
+	    function TrendingService() {
+	        var _this = _super.call(this, Trending_1.default.RESOURCE_NAME) || this;
+	        __this = _this;
+	        return _this;
+	    }
+	    TrendingService.prototype.getResource = function () {
+	        return Trending_1.default;
+	    };
+	    TrendingService.prototype.getTrendings = function (req, res, next) {
+	        return __awaiter(this, void 0, void 0, function () {
+	            return __generator(this, function (_a) {
+	                HalHandler_1.default.process(__this, req, res, Trending_1.default);
+	                return [2 /*return*/];
+	            });
+	        });
+	    };
+	    return TrendingService;
+	}(PostgreRepository_1.default));
+	__decorate([
+	    route_1.default(Method_1.default.GET, ['/trending/:id', '/trending']),
+	    __metadata("design:type", Function),
+	    __metadata("design:paramtypes", [Object, Object, Object]),
+	    __metadata("design:returntype", Promise)
+	], TrendingService.prototype, "getTrendings", null);
+	exports.default = TrendingService;
 
 
 /***/ }),
 /* 38 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = {
-	    "likeCounter": {
-	        "type": "bigint",
-	        "name": "likecounter"
-	    },
-	    "loveCounter": {
-	        "type": "bigint",
-	        "name": "lovecounter"
-	    },
-	    "funCounter": {
-	        "type": "bigint",
-	        "name": "funcounter"
-	    },
-	    "wowCounter": {
-	        "type": "bigint",
-	        "name": "wowcounter"
-	    },
-	    "sadCounter": {
-	        "type": "bigint",
-	        "name": "sancounter"
-	    },
-	    "angryCounter": {
-	        "type": "bigint",
-	        "name": "angrycounter"
-	    },
-	    "reportCounter": {
-	        "type": "bigint",
-	        "name": "reportcounter"
-	    }
-	};
-
-
-/***/ }),
-/* 39 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = {
-	    "name": {
-	        "type": "text",
-	        "name": "name"
-	    },
-	    "lastName": {
-	        "type": "text",
-	        "name": "lastname"
-	    },
-	    "email": {
-	        "type": "text",
-	        "name": "email"
-	    },
-	    "age": {
-	        "type": "bigint",
-	        "name": "age"
-	    },
-	    "bio": {
-	        "type": "text",
-	        "name": "bio"
-	    },
-	    "photo": {
-	        "type": "text",
-	        "name": "photo"
-	    }
-	};
-
-
-/***/ }),
-/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1878,7 +1883,7 @@
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Resource_1 = __webpack_require__(12);
-	var mapper = __webpack_require__(37);
+	var mapper = __webpack_require__(39);
 	/**
 	 * Trending Resource definition
 	 * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
@@ -1942,10 +1947,112 @@
 
 
 /***/ }),
+/* 39 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = {
+	    "id": {
+	        "type": "bigint",
+	        "name": "id"
+	    },
+	    "image": {
+	        "type": "text",
+	        "name": "image"
+	    },
+	    "title": {
+	        "type": "text",
+	        "name": "title"
+	    },
+	    "location": {
+	        "type": "text",
+	        "name": "location"
+	    },
+	    "fans": {
+	        "type": "bigint",
+	        "name": "fans"
+	    }
+	};
+
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = {
+	    "likeCounter": {
+	        "type": "bigint",
+	        "name": "likecounter"
+	    },
+	    "loveCounter": {
+	        "type": "bigint",
+	        "name": "lovecounter"
+	    },
+	    "funCounter": {
+	        "type": "bigint",
+	        "name": "funcounter"
+	    },
+	    "wowCounter": {
+	        "type": "bigint",
+	        "name": "wowcounter"
+	    },
+	    "sadCounter": {
+	        "type": "bigint",
+	        "name": "sancounter"
+	    },
+	    "angryCounter": {
+	        "type": "bigint",
+	        "name": "angrycounter"
+	    },
+	    "reportCounter": {
+	        "type": "bigint",
+	        "name": "reportcounter"
+	    }
+	};
+
+
+/***/ }),
 /* 41 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = {
+	    "name": {
+	        "type": "text",
+	        "name": "name"
+	    },
+	    "lastName": {
+	        "type": "text",
+	        "name": "lastname"
+	    },
+	    "email": {
+	        "type": "text",
+	        "name": "email"
+	    },
+	    "age": {
+	        "type": "bigint",
+	        "name": "age"
+	    },
+	    "bio": {
+	        "type": "text",
+	        "name": "bio"
+	    },
+	    "photo": {
+	        "type": "text",
+	        "name": "photo"
+	    }
+	};
+
+
+/***/ }),
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	const root = __webpack_require__(42).path;
+	const root = __webpack_require__(43).path;
 	
 	module.exports = {
 	    entry: `${root}/src/start.ts`,
@@ -1977,105 +2084,10 @@
 	};
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports) {
 
 	module.exports = require("app-root-path");
-
-/***/ }),
-/* 43 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || (function () {
-	    var extendStatics = Object.setPrototypeOf ||
-	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-	    return function (d, b) {
-	        extendStatics(d, b);
-	        function __() { this.constructor = d; }
-	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	    };
-	})();
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	var __generator = (this && this.__generator) || function (thisArg, body) {
-	    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-	    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-	    function verb(n) { return function (v) { return step([n, v]); }; }
-	    function step(op) {
-	        if (f) throw new TypeError("Generator is already executing.");
-	        while (_) try {
-	            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-	            if (y = 0, t) op = [0, t.value];
-	            switch (op[0]) {
-	                case 0: case 1: t = op; break;
-	                case 4: _.label++; return { value: op[1], done: false };
-	                case 5: _.label++; y = op[1]; op = [0]; continue;
-	                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-	                default:
-	                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-	                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-	                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-	                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-	                    if (t[2]) _.ops.pop();
-	                    _.trys.pop(); continue;
-	            }
-	            op = body.call(thisArg, _);
-	        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-	        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-	    }
-	};
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var Trending_1 = __webpack_require__(40);
-	var PostgreRepository_1 = __webpack_require__(32);
-	var Method_1 = __webpack_require__(9);
-	var route_1 = __webpack_require__(34);
-	var HalHandler_1 = __webpack_require__(35);
-	var __this;
-	var TrendingService = (function (_super) {
-	    __extends(TrendingService, _super);
-	    function TrendingService() {
-	        var _this = _super.call(this, Trending_1.default.RESOURCE_NAME) || this;
-	        __this = _this;
-	        return _this;
-	    }
-	    TrendingService.prototype.getResource = function () {
-	        return Trending_1.default;
-	    };
-	    TrendingService.prototype.getTrendings = function (req, res, next) {
-	        return __awaiter(this, void 0, void 0, function () {
-	            return __generator(this, function (_a) {
-	                HalHandler_1.default.process(__this, req, res, Trending_1.default);
-	                return [2 /*return*/];
-	            });
-	        });
-	    };
-	    return TrendingService;
-	}(PostgreRepository_1.default));
-	__decorate([
-	    route_1.default(Method_1.default.GET, ['/trending/:id', '/trending']),
-	    __metadata("design:type", Function),
-	    __metadata("design:paramtypes", [Object, Object, Object]),
-	    __metadata("design:returntype", Promise)
-	], TrendingService.prototype, "getTrendings", null);
-	exports.default = TrendingService;
-
 
 /***/ })
 /******/ ])));

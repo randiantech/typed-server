@@ -11,8 +11,7 @@ const pool = new pg.Pool(props().postgresql);
  */
 export function resolveTupleOperation(op: QueryTupleOperation) {
   switch (op) {
-    //TODO Do the resolution for contains! :)
-    case QueryTupleOperation.CONTAINS: return ''
+    case QueryTupleOperation.CONTAINS: return 'LIKE'
     case QueryTupleOperation.EQUALS: return '='
     case QueryTupleOperation.GREATER_THAN: return '>'
     case QueryTupleOperation.LESSER_THAN: return '<'

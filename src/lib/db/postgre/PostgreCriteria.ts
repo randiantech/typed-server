@@ -1,7 +1,8 @@
 import Criteria from '../../criteria/Criteria'
 import QueryTuple from '../../resource/QueryTuple'
+import QueryTupleOperation from '../../resource/QueryTupleOperation'
 import MapperProvider from '../../mapper/MapperProvider'
-import { resolveOperation } from '../../utils/utils.db'
+import { resolveOperation, resolveKey } from '../../utils/utils.db'
 import { resolveTupleOperation } from './utils.postgre'
 
 /**
@@ -61,7 +62,9 @@ export default class PostgreCriteria implements Criteria {
 
                 default:
                     values.push(tuple.fieldValue)
-                    whereStatement += `${tuple.fieldName}::${tuple.fieldType}${resolveTupleOperation(tuple.operation)}$${fieldPosition}`
+                    let operation = resolveTupleOperation(tuple.operation)
+                    tuple.operation === QueryTupleOperation.CONTAINS ? tuple.fieldValue = `%${tuple.fieldValue}%` : ''
+                    whereStatement += `${tuple.fieldName}::${tuple.fieldType} ${resolveTupleOperation(tuple.operation)} $${fieldPosition}`
                     whereStatement += ` AND `
                     break
             }
@@ -99,7 +102,7 @@ export default class PostgreCriteria implements Criteria {
         let tuples = []
 
         Object.keys(request.query).forEach((key) => {
-            let mapping = MapperProvider.get(resource.name, key)
+            let mapping = MapperProvider.get(resource.name, resolveKey(key))
             let value = request.query[key]
             tuples.push(new QueryTuple(mapping.name, value, mapping.type, resolveOperation(key)))
         })

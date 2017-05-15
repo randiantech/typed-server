@@ -7,13 +7,9 @@ import QueryTupleOperation from '../resource/QueryTupleOperation'
  * @returns {QueryTupleOperation} A QueryTupleOperation (in example, EQUALS)
  */
 export function resolveOperation(key) {
-  let _containsPrefix = (key) => {
-    return !key || key[2] != '_' || key.length < 3
-  }
+  if (!containsOperationPrefix(key)) return QueryTupleOperation.EQUALS
 
-  if (!_containsPrefix(key)) return QueryTupleOperation.EQUALS
-
-  let opPrefix = key.substring(0, 3).toLowerCase()
+  let opPrefix = key.substring(0, 2).toLowerCase()
 
   switch (opPrefix) {
     case 'eq': return QueryTupleOperation.EQUALS
@@ -21,5 +17,18 @@ export function resolveOperation(key) {
     case 'lt': return QueryTupleOperation.LESSER_THAN
     case 'ct': return QueryTupleOperation.CONTAINS
     default: return QueryTupleOperation.EQUALS
+  }
+}
+
+export function containsOperationPrefix(key) {
+  return key.startsWith('eq_') || key.startsWith('gt_') || key.startsWith('lt_') || key.startsWith('ct_')
+}
+
+
+export function resolveKey(key) {
+  if (containsOperationPrefix(key)) {
+    return key.substring(3, key.length)
+  } else {
+    return key
   }
 }
