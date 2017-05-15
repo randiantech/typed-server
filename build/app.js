@@ -44,31 +44,23 @@
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	__webpack_require__(1);
-	module.exports = __webpack_require__(42);
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Application_1 = __webpack_require__(2);
-	var ProfileService_1 = __webpack_require__(10);
-	var MessageService_1 = __webpack_require__(36);
-	var TrendingService_1 = __webpack_require__(37);
-	var MapperProvider_1 = __webpack_require__(20);
-	var Message_mapper_1 = __webpack_require__(30);
-	var Trending_mapper_1 = __webpack_require__(39);
-	var MessageSocialInfo_mapper_1 = __webpack_require__(40);
-	var PersonalInfo_mapper_1 = __webpack_require__(41);
-	var Profile_mapper_1 = __webpack_require__(31);
-	var Message_1 = __webpack_require__(28);
-	var MessageSocialInfo_1 = __webpack_require__(29);
-	var PersonalInfo_1 = __webpack_require__(15);
-	var Profile_1 = __webpack_require__(11);
-	var Trending_1 = __webpack_require__(38);
+	var Application_1 = __webpack_require__(1);
+	var ProfileService_1 = __webpack_require__(9);
+	var MessageService_1 = __webpack_require__(35);
+	var TrendingService_1 = __webpack_require__(36);
+	var MapperProvider_1 = __webpack_require__(19);
+	var Message_mapper_1 = __webpack_require__(29);
+	var Trending_mapper_1 = __webpack_require__(38);
+	var MessageSocialInfo_mapper_1 = __webpack_require__(39);
+	var PersonalInfo_mapper_1 = __webpack_require__(40);
+	var Profile_mapper_1 = __webpack_require__(30);
+	var Message_1 = __webpack_require__(27);
+	var MessageSocialInfo_1 = __webpack_require__(28);
+	var PersonalInfo_1 = __webpack_require__(14);
+	var Profile_1 = __webpack_require__(10);
+	var Trending_1 = __webpack_require__(37);
 	var port = process.env.APP_PORT;
 	var apiVersion = 2;
 	var host = "http://localhost:3000/";
@@ -81,17 +73,17 @@
 
 
 /***/ }),
-/* 2 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var express = __webpack_require__(3);
-	var logger = __webpack_require__(4);
-	var bodyParser = __webpack_require__(5);
-	var cookieParser = __webpack_require__(6);
-	var http = __webpack_require__(7);
-	var RouterFactory_1 = __webpack_require__(8);
+	var express = __webpack_require__(2);
+	var logger = __webpack_require__(3);
+	var bodyParser = __webpack_require__(4);
+	var cookieParser = __webpack_require__(5);
+	var http = __webpack_require__(6);
+	var RouterFactory_1 = __webpack_require__(7);
 	var _services = {};
 	var app = express();
 	/**
@@ -150,43 +142,43 @@
 
 
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, exports) {
 
 	module.exports = require("express");
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, exports) {
 
 	module.exports = require("morgan");
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports) {
 
 	module.exports = require("body-parser");
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, exports) {
 
 	module.exports = require("cookie-parser");
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, exports) {
 
 	module.exports = require("http");
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var express = __webpack_require__(3);
-	var Method_1 = __webpack_require__(9);
+	var express = __webpack_require__(2);
+	var Method_1 = __webpack_require__(8);
 	var router = express.Router();
 	/**
 	 * Router Factory is responsible to create routes for resource services
@@ -229,7 +221,7 @@
 
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -250,7 +242,7 @@
 
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -309,11 +301,11 @@
 	    }
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Profile_1 = __webpack_require__(11);
-	var PostgreRepository_1 = __webpack_require__(32);
-	var Method_1 = __webpack_require__(9);
-	var route_1 = __webpack_require__(34);
-	var HalHandler_1 = __webpack_require__(35);
+	var Profile_1 = __webpack_require__(10);
+	var PostgreRepository_1 = __webpack_require__(31);
+	var Method_1 = __webpack_require__(8);
+	var route_1 = __webpack_require__(33);
+	var HalHandler_1 = __webpack_require__(34);
 	var __this;
 	var ProfileService = (function (_super) {
 	    __extends(ProfileService, _super);
@@ -345,7 +337,7 @@
 
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -360,15 +352,15 @@
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Resource_1 = __webpack_require__(12);
-	var PersonalInfo_1 = __webpack_require__(15);
-	var ApplicationException_1 = __webpack_require__(13);
-	var EmbeddedResource_1 = __webpack_require__(16);
-	var PostgreCriteria_1 = __webpack_require__(17);
-	var QueryTuple_1 = __webpack_require__(18);
-	var QueryTupleOperation_1 = __webpack_require__(19);
-	var Message_1 = __webpack_require__(28);
-	var mapper = __webpack_require__(31);
+	var Resource_1 = __webpack_require__(11);
+	var PersonalInfo_1 = __webpack_require__(14);
+	var ApplicationException_1 = __webpack_require__(12);
+	var EmbeddedResource_1 = __webpack_require__(15);
+	var PostgreCriteria_1 = __webpack_require__(16);
+	var QueryTuple_1 = __webpack_require__(17);
+	var QueryTupleOperation_1 = __webpack_require__(18);
+	var Message_1 = __webpack_require__(27);
+	var mapper = __webpack_require__(30);
 	/**
 	 * Profile Resource definition
 	 * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
@@ -433,7 +425,7 @@
 
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -473,9 +465,9 @@
 	    }
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var ApplicationException_1 = __webpack_require__(13);
-	var Application_1 = __webpack_require__(2);
-	var utils_1 = __webpack_require__(14);
+	var ApplicationException_1 = __webpack_require__(12);
+	var Application_1 = __webpack_require__(1);
+	var utils_1 = __webpack_require__(13);
 	/**
 	 * Abstract class required to be fully implemented by final resource classes. It provides a more strict resource
 	 * contract as well as common functionality required by any resource, in example, to fully generate a HAL representation
@@ -562,7 +554,7 @@
 
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -601,7 +593,7 @@
 
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -642,7 +634,7 @@
 
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -706,7 +698,7 @@
 
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -753,16 +745,16 @@
 
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var QueryTuple_1 = __webpack_require__(18);
-	var QueryTupleOperation_1 = __webpack_require__(19);
-	var MapperProvider_1 = __webpack_require__(20);
-	var utils_db_1 = __webpack_require__(21);
-	var utils_postgre_1 = __webpack_require__(22);
+	var QueryTuple_1 = __webpack_require__(17);
+	var QueryTupleOperation_1 = __webpack_require__(18);
+	var MapperProvider_1 = __webpack_require__(19);
+	var utils_db_1 = __webpack_require__(20);
+	var utils_postgre_1 = __webpack_require__(21);
 	/**
 	 * Implementation of a Criteria for Postgre databases. A criteria is capable to resolve to a parametrized query through
 	 * QueryTuples.
@@ -859,7 +851,7 @@
 
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -912,7 +904,7 @@
 
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -932,7 +924,7 @@
 
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -998,12 +990,12 @@
 
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var QueryTupleOperation_1 = __webpack_require__(19);
+	var QueryTupleOperation_1 = __webpack_require__(18);
 	/**
 	 * Given an object key, extract the corresponding operation identifier.
 	 * In example, the key is eq_<KEY_NAME>, it extracts the identifier (_eq) and returns the corresponding operation
@@ -1039,14 +1031,14 @@
 
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var QueryTupleOperation_1 = __webpack_require__(19);
-	var props = __webpack_require__(23);
-	var pg = __webpack_require__(27);
+	var QueryTupleOperation_1 = __webpack_require__(18);
+	var props = __webpack_require__(22);
+	var pg = __webpack_require__(26);
 	var pool = new pg.Pool(props().postgresql);
 	/**
 	 * Given a QueryTupleOperation, resolves to the corresponding Postgres operator
@@ -1074,13 +1066,13 @@
 
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var local = __webpack_require__(24);
-	var dev = __webpack_require__(25);
-	var prod = __webpack_require__(26);
+	var local = __webpack_require__(23);
+	var dev = __webpack_require__(24);
+	var prod = __webpack_require__(25);
 	/**
 	 * Utility function used to load the corresponding configuration file
 	 * @returns {TypeNode|Type|boolean}
@@ -1097,6 +1089,25 @@
 
 
 /***/ }),
+/* 23 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = {
+	    "postgresql": {
+	        "user": "postgres",
+	        "database": "postgres",
+	        "password": "FFRDFGHT##32__R$$R$%SSDDSSD)()()()Ss@@@__",
+	        "host": "35.186.174.249",
+	        "port": 5432,
+	        "max": 10,
+	        "idleTimeoutMillis": 30000
+	    }
+	};
+
+
+/***/ }),
 /* 24 */
 /***/ (function(module, exports) {
 
@@ -1104,10 +1115,10 @@
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = {
 	    "postgresql": {
-	        "user": "juan",
-	        "database": "autokal",
-	        "password": "travel",
-	        "host": "localhost",
+	        "user": "postgres",
+	        "database": "postgres",
+	        "password": "FFRDFGHT##32__R$$R$%SSDDSSD)()()()Ss@@@__",
+	        "host": "35.186.174.249",
 	        "port": 5432,
 	        "max": 10,
 	        "idleTimeoutMillis": 30000
@@ -1123,10 +1134,10 @@
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = {
 	    "postgresql": {
-	        "user": "juan",
-	        "database": "autokal",
-	        "password": "travel",
-	        "host": "localhost",
+	        "user": "postgres",
+	        "database": "postgres",
+	        "password": "FFRDFGHT##32__R$$R$%SSDDSSD)()()()Ss@@@__",
+	        "host": "35.186.174.249",
 	        "port": 5432,
 	        "max": 10,
 	        "idleTimeoutMillis": 30000
@@ -1138,29 +1149,10 @@
 /* 26 */
 /***/ (function(module, exports) {
 
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = {
-	    "postgresql": {
-	        "user": "juan",
-	        "database": "autokal",
-	        "password": "travel",
-	        "host": "localhost",
-	        "port": 5432,
-	        "max": 10,
-	        "idleTimeoutMillis": 30000
-	    }
-	};
-
-
-/***/ }),
-/* 27 */
-/***/ (function(module, exports) {
-
 	module.exports = require("pg");
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1175,14 +1167,14 @@
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Resource_1 = __webpack_require__(12);
-	var EmbeddedResource_1 = __webpack_require__(16);
-	var PostgreCriteria_1 = __webpack_require__(17);
-	var MessageSocialInfo_1 = __webpack_require__(29);
-	var QueryTuple_1 = __webpack_require__(18);
-	var QueryTupleOperation_1 = __webpack_require__(19);
-	var Profile_1 = __webpack_require__(11);
-	var mapper = __webpack_require__(30);
+	var Resource_1 = __webpack_require__(11);
+	var EmbeddedResource_1 = __webpack_require__(15);
+	var PostgreCriteria_1 = __webpack_require__(16);
+	var MessageSocialInfo_1 = __webpack_require__(28);
+	var QueryTuple_1 = __webpack_require__(17);
+	var QueryTupleOperation_1 = __webpack_require__(18);
+	var Profile_1 = __webpack_require__(10);
+	var mapper = __webpack_require__(29);
 	/**
 	 * Message Resource definition
 	 * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
@@ -1252,7 +1244,7 @@
 
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -1310,7 +1302,7 @@
 
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -1339,7 +1331,7 @@
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -1356,7 +1348,7 @@
 
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1396,10 +1388,10 @@
 	    }
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var PostgreCriteria_1 = __webpack_require__(17);
-	var Response_1 = __webpack_require__(33);
-	var ApplicationException_1 = __webpack_require__(13);
-	var pool = __webpack_require__(22);
+	var PostgreCriteria_1 = __webpack_require__(16);
+	var Response_1 = __webpack_require__(32);
+	var ApplicationException_1 = __webpack_require__(12);
+	var pool = __webpack_require__(21);
 	/**
 	 * PostgreSql Repository. Used to provide resource services with operations to interact with a Postgre database
 	 * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
@@ -1488,7 +1480,7 @@
 
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -1510,12 +1502,12 @@
 
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var RouterFactory_1 = __webpack_require__(8);
+	var RouterFactory_1 = __webpack_require__(7);
 	/**
 	 * Method level decorator responsible to attach routes to resource services.
 	 * @param verb the HTTP verb (GET, PUT, POST, etc...)
@@ -1530,7 +1522,7 @@
 
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1570,8 +1562,8 @@
 	    }
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var utils_1 = __webpack_require__(14);
-	var Application_1 = __webpack_require__(2);
+	var utils_1 = __webpack_require__(13);
+	var Application_1 = __webpack_require__(1);
 	var HalHandler = (function () {
 	    function HalHandler() {
 	    }
@@ -1661,6 +1653,117 @@
 
 
 /***/ }),
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	    return c > 3 && r && Object.defineProperty(target, key, r), r;
+	};
+	var __metadata = (this && this.__metadata) || function (k, v) {
+	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+	};
+	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+	    return new (P || (P = Promise))(function (resolve, reject) {
+	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+	        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+	        step((generator = generator.apply(thisArg, _arguments || [])).next());
+	    });
+	};
+	var __generator = (this && this.__generator) || function (thisArg, body) {
+	    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+	    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+	    function verb(n) { return function (v) { return step([n, v]); }; }
+	    function step(op) {
+	        if (f) throw new TypeError("Generator is already executing.");
+	        while (_) try {
+	            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+	            if (y = 0, t) op = [0, t.value];
+	            switch (op[0]) {
+	                case 0: case 1: t = op; break;
+	                case 4: _.label++; return { value: op[1], done: false };
+	                case 5: _.label++; y = op[1]; op = [0]; continue;
+	                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+	                default:
+	                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+	                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+	                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+	                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+	                    if (t[2]) _.ops.pop();
+	                    _.trys.pop(); continue;
+	            }
+	            op = body.call(thisArg, _);
+	        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+	        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+	    }
+	};
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Message_1 = __webpack_require__(27);
+	var PostgreRepository_1 = __webpack_require__(31);
+	var Method_1 = __webpack_require__(8);
+	var route_1 = __webpack_require__(33);
+	var HalHandler_1 = __webpack_require__(34);
+	var __this;
+	/**
+	 * Service for Message resource
+	 * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
+	 */
+	var MessageService = (function (_super) {
+	    __extends(MessageService, _super);
+	    /**
+	     * constructor
+	     */
+	    function MessageService() {
+	        var _this = _super.call(this, Message_1.default.RESOURCE_NAME) || this;
+	        __this = _this;
+	        return _this;
+	    }
+	    /**
+	     * @returns {Message} the resource to which this service is bind to
+	     */
+	    MessageService.prototype.getResource = function () {
+	        return Message_1.default;
+	    };
+	    /**
+	     * HTTP route
+	     * @param req HTTP request
+	     * @param res HTTP response
+	     * @param next callback handler
+	     */
+	    MessageService.prototype.searchForMessages = function (req, res, next) {
+	        return __awaiter(this, void 0, void 0, function () {
+	            return __generator(this, function (_a) {
+	                HalHandler_1.default.process(__this, req, res, Message_1.default);
+	                return [2 /*return*/];
+	            });
+	        });
+	    };
+	    return MessageService;
+	}(PostgreRepository_1.default));
+	__decorate([
+	    route_1.default(Method_1.default.GET, ['/profile/:profileId/message', '/profile/:profileId/message/:id']),
+	    __metadata("design:type", Function),
+	    __metadata("design:paramtypes", [Object, Object, Object]),
+	    __metadata("design:returntype", Promise)
+	], MessageService.prototype, "searchForMessages", null);
+	exports.default = MessageService;
+
+
+/***/ }),
 /* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1720,122 +1823,11 @@
 	    }
 	};
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Message_1 = __webpack_require__(28);
-	var PostgreRepository_1 = __webpack_require__(32);
-	var Method_1 = __webpack_require__(9);
-	var route_1 = __webpack_require__(34);
-	var HalHandler_1 = __webpack_require__(35);
-	var __this;
-	/**
-	 * Service for Message resource
-	 * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
-	 */
-	var MessageService = (function (_super) {
-	    __extends(MessageService, _super);
-	    /**
-	     * constructor
-	     */
-	    function MessageService() {
-	        var _this = _super.call(this, Message_1.default.RESOURCE_NAME) || this;
-	        __this = _this;
-	        return _this;
-	    }
-	    /**
-	     * @returns {Message} the resource to which this service is bind to
-	     */
-	    MessageService.prototype.getResource = function () {
-	        return Message_1.default;
-	    };
-	    /**
-	     * HTTP route
-	     * @param req HTTP request
-	     * @param res HTTP response
-	     * @param next callback handler
-	     */
-	    MessageService.prototype.searchForMessages = function (req, res, next) {
-	        return __awaiter(this, void 0, void 0, function () {
-	            return __generator(this, function (_a) {
-	                HalHandler_1.default.process(__this, req, res, Message_1.default);
-	                return [2 /*return*/];
-	            });
-	        });
-	    };
-	    return MessageService;
-	}(PostgreRepository_1.default));
-	__decorate([
-	    route_1.default(Method_1.default.GET, ['/profile/:profileId/message', '/profile/:profileId/message/:id']),
-	    __metadata("design:type", Function),
-	    __metadata("design:paramtypes", [Object, Object, Object]),
-	    __metadata("design:returntype", Promise)
-	], MessageService.prototype, "searchForMessages", null);
-	exports.default = MessageService;
-
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || (function () {
-	    var extendStatics = Object.setPrototypeOf ||
-	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-	    return function (d, b) {
-	        extendStatics(d, b);
-	        function __() { this.constructor = d; }
-	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	    };
-	})();
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	    return c > 3 && r && Object.defineProperty(target, key, r), r;
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-	    return new (P || (P = Promise))(function (resolve, reject) {
-	        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-	        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-	        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-	        step((generator = generator.apply(thisArg, _arguments || [])).next());
-	    });
-	};
-	var __generator = (this && this.__generator) || function (thisArg, body) {
-	    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-	    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-	    function verb(n) { return function (v) { return step([n, v]); }; }
-	    function step(op) {
-	        if (f) throw new TypeError("Generator is already executing.");
-	        while (_) try {
-	            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-	            if (y = 0, t) op = [0, t.value];
-	            switch (op[0]) {
-	                case 0: case 1: t = op; break;
-	                case 4: _.label++; return { value: op[1], done: false };
-	                case 5: _.label++; y = op[1]; op = [0]; continue;
-	                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-	                default:
-	                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-	                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-	                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-	                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-	                    if (t[2]) _.ops.pop();
-	                    _.trys.pop(); continue;
-	            }
-	            op = body.call(thisArg, _);
-	        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-	        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-	    }
-	};
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var Trending_1 = __webpack_require__(38);
-	var PostgreRepository_1 = __webpack_require__(32);
-	var Method_1 = __webpack_require__(9);
-	var route_1 = __webpack_require__(34);
-	var HalHandler_1 = __webpack_require__(35);
+	var Trending_1 = __webpack_require__(37);
+	var PostgreRepository_1 = __webpack_require__(31);
+	var Method_1 = __webpack_require__(8);
+	var route_1 = __webpack_require__(33);
+	var HalHandler_1 = __webpack_require__(34);
 	var __this;
 	var TrendingService = (function (_super) {
 	    __extends(TrendingService, _super);
@@ -1867,7 +1859,7 @@
 
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1882,8 +1874,8 @@
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Resource_1 = __webpack_require__(12);
-	var mapper = __webpack_require__(39);
+	var Resource_1 = __webpack_require__(11);
+	var mapper = __webpack_require__(38);
 	/**
 	 * Trending Resource definition
 	 * @author Juan Carlos Cancela <cancela.juancarlos@gmail.com>
@@ -1947,7 +1939,7 @@
 
 
 /***/ }),
-/* 39 */
+/* 38 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -1977,7 +1969,7 @@
 
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -2015,7 +2007,7 @@
 
 
 /***/ }),
-/* 41 */
+/* 40 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -2047,47 +2039,6 @@
 	    }
 	};
 
-
-/***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	const root = __webpack_require__(43).path;
-	
-	module.exports = {
-	    entry: `${root}/src/start.ts`,
-	    target: 'node',
-	    externals: [
-	        /^[a-z\-0-9]+$/ // Ignore node_modules folder
-	    ],
-	    output: {
-	        filename: 'app.js',
-	        path: `${root}/build`,
-	        libraryTarget: "commonjs"
-	    },
-	    resolve: {
-	        // Add in `.ts` and `.tsx` as a resolvable extension.
-	        extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
-	    },
-	    resolveLoader: {
-	        root: [`${root}/node_modules`]
-	    },
-	    module: {
-	        loaders: [{
-	            // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
-	            test: /\.tsx?$/,
-	            exclude: 'node_modules',
-	            loader: 'ts-loader'
-	        }]
-	    },
-	    devtool: '#source-map'
-	};
-
-/***/ }),
-/* 43 */
-/***/ (function(module, exports) {
-
-	module.exports = require("app-root-path");
 
 /***/ })
 /******/ ])));
