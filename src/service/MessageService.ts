@@ -34,6 +34,12 @@ export default class MessageService extends PostgreRepository<Message> {
      */
     @route(Method.GET, ['/profile/:profileId/message', '/profile/:profileId/message/:id'])
     async searchForMessages(req, res, next) {
-        HalHandler.process(__this, req, res, Message)
+        HalHandler.search(__this, req, res, Message)
+    }
+
+    @route(Method.POST, '/message')
+    async createMessage(req, res, next) {
+        let response = await __this.create(req.body)
+        res.send('created')
     }
 }

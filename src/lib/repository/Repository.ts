@@ -21,7 +21,7 @@ interface Repository<T> {
     /**
      * Creates a resource instance
      */
-    create(instance: T): T
+    create(values: object): Promise<Response<T>>
 
     /**
      * Updates an existing instance

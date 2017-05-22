@@ -18,6 +18,6 @@ export default class ProfileService extends PostgreRepository<Profile> {
 
     @route(Method.GET, ['/profile/:id', '/profile'])
     async getProfile(req, res, next) {
-        HalHandler.process(__this, req, res, Profile)
+        HalHandler.search(__this, req, res, Profile)
     }
 }

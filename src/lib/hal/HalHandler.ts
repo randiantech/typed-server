@@ -35,7 +35,7 @@ export default class HalHandler {
      * @param res the HTTP response object
      * @param resource a resource
      */
-    static async process(service, req, res, resource) {
+    static async search(service, req, res, resource) {
         injectIdParams(req)
         try {
             let response = await service.searchByRequest(req, resource)

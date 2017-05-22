@@ -18,6 +18,21 @@ export function resolveTupleOperation(op: QueryTupleOperation) {
   }
 }
 
+/**
+ * Creates an string of query placeholders.
+ * IE: Given quantity=N => $1,$2,$3,...$N
+ * Particularly handy when creating Insert queries using prepared statements
+ * @param quantity number of parameters
+ * @return An string $1,..$N where N=quantity
+ */
+export function createStringOfPlaceholders(quantity: number){
+  let val = ``
+  for(var i = 0; i < quantity; i++){
+    val += `$${i},`
+  }
+  return val.slice(0, -1)
+}
+
 pool.on('error', (err, client) => {
   console.error('idle client error', err.message, err.stack);
 });

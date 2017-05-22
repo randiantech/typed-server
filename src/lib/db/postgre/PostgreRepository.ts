@@ -3,6 +3,7 @@ import PostgreCriteria from './PostgreCriteria'
 import Repository from '../../repository/Repository'
 import Response from '../../repository/Response'
 import ApplicationException from '../../error/ApplicationException'
+import { createStringOfPlaceholders } from './utils.postgre'
 const pool = require('./utils.postgre')
 
 /**
@@ -62,8 +63,15 @@ abstract class PostgreRepository<T extends Resource<T>> implements Repository<T>
         }
     }
 
-    create(instance: T): T {
-        throw new Error('Method not implemented.');
+    /**
+     * @param values
+     */
+    async create(values: object): Promise<Response<T>> {
+        //TODO This is hardcoded for the sake of MVP. Needs rework!
+        let p = createStringOfPlaceholders(Object.keys(values).length)
+        let keys = Object.keys(values).toString()
+        let res = await pool.query(`INSERT INTO ${this.getName()}(value, profileid, date) VALUES ($1,$2,$3)`, [values['value'], 1, new Date().getTime()])
+        return new Response<T>(null, 1)
     }
 
     update(id: string, updatedInstance: T): T {

@@ -18,6 +18,6 @@ export default class TrendingService extends PostgreRepository<Trending> {
 
     @route(Method.GET, ['/trending/:id', '/trending'])
     async getTrendings(req, res, next) {
-        HalHandler.process(__this, req, res, Trending)
+        HalHandler.search(__this, req, res, Trending)
     }
 }
