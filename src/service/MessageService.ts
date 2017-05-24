@@ -32,7 +32,7 @@ export default class MessageService extends PostgreRepository<Message> {
      * @param res HTTP response
      * @param next callback handler
      */
-    @route(Method.GET, ['/profile/:profileId/message', '/profile/:profileId/message/:id'])
+    @route(Method.GET, ['/profile/:profileId/message', '/profile/:profileId/message/:id', '/message'])
     async searchForMessages(req, res, next) {
         HalHandler.search(__this, req, res, Message)
     }
