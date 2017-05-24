@@ -70,7 +70,7 @@ abstract class PostgreRepository<T extends Resource<T>> implements Repository<T>
         //TODO This is hardcoded for the sake of MVP. Needs rework!
         let p = createStringOfPlaceholders(Object.keys(values).length)
         let keys = Object.keys(values).toString()
-        let res = await pool.query(`INSERT INTO ${this.getName()}(value, profileid, date) VALUES ($1,$2,$3)`, [values['value'], 1, new Date().getTime()])
+        let res = await pool.query(`INSERT INTO ${this.getName()}(value, profileid, date) VALUES ($1,$2,$3)`, [values['value'], values['profileid'], new Date().getTime()])
         return new Response<T>(null, 1)
     }
 
