@@ -45,10 +45,10 @@ export default class Message extends Resource<Message> {
      */
     embeddeds(): EmbeddedResource[] {
         return [
-            new EmbeddedResource(
-                'profile',
-                Profile.RESOURCE_NAME,
-                new PostgreCriteria([new QueryTuple('id', this.profileId, 'bigint', QueryTupleOperation.EQUALS)]))
+            // new EmbeddedResource(
+            //     'profile',
+            //     Profile.RESOURCE_NAME,
+            //     new PostgreCriteria([new QueryTuple('id', this.profileId, 'bigint', QueryTupleOperation.EQUALS)]))
         ]
     }
 
