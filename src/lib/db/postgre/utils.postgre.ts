@@ -1,4 +1,5 @@
 import QueryTupleOperation from '../../resource/QueryTupleOperation'
+import MapperProvider from '../../mapper/MapperProvider'
 
 const props = require('../../utils/utils.props');
 const pg = require('pg')
@@ -25,12 +26,27 @@ export function resolveTupleOperation(op: QueryTupleOperation) {
  * @param quantity number of parameters
  * @return An string $1,..$N where N=quantity
  */
-export function createStringOfPlaceholders(quantity: number){
+export function createStringOfPlaceholders(quantity: number) {
   let val = ``
-  for(var i = 0; i < quantity; i++){
+  for (var i = 1; i <= quantity; i++) {
     val += `$${i},`
   }
   return val.slice(0, -1)
+}
+
+export function createInsertSqlQuery(resourceName, vals: any): { statement: string, values: Array<any> } {
+  let values = []
+  let statementValues = []
+  
+  Object.keys(vals).forEach((value) => {
+    statementValues.push(MapperProvider.get(resourceName, value).name)
+    values.push(vals[value])
+  })
+
+  let p = createStringOfPlaceholders(values.length)
+  let statement = `INSERT INTO ${resourceName}(${statementValues.toString()}) VALUES (${p})`
+
+  return { statement, values }
 }
 
 pool.on('error', (err, client) => {

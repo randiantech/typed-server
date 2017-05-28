@@ -3,7 +3,7 @@ import PostgreCriteria from './PostgreCriteria'
 import Repository from '../../repository/Repository'
 import Response from '../../repository/Response'
 import ApplicationException from '../../error/ApplicationException'
-import { createStringOfPlaceholders } from './utils.postgre'
+import { createStringOfPlaceholders, createInsertSqlQuery } from './utils.postgre'
 const pool = require('./utils.postgre')
 
 /**
@@ -50,28 +50,34 @@ abstract class PostgreRepository<T extends Resource<T>> implements Repository<T>
     async search(criteria: PostgreCriteria, resource: T): Promise<Response<T[]>> {
         let resolvedCriteria
         resolvedCriteria = criteria.resolve(this.getName())
-        let res = await pool.query(resolvedCriteria.statement, resolvedCriteria.values)
-        let total = await pool.query(resolvedCriteria.totalsStatement, resolvedCriteria.values)
-        if (res.rows.length === 0) {
-            throw new ApplicationException(`Does not exist any ${this.getName()} that matches given criteria`)
-        } else {
-            let resources = []
-            res.rows.forEach((row) => {
-                resources.push(resource.create(row))
-            })
-            return new Response<T[]>(resources, parseInt(total.rows[0].count))
+        let res, tot
+        try {
+            res = await pool.query(resolvedCriteria.statement, resolvedCriteria.values)
+            tot = await pool.query(resolvedCriteria.totalsStatement, resolvedCriteria.values)
+        } catch (e) {
+            throw new ApplicationException(e.message)
         }
+        let resources = []
+        res.rows.forEach((row) => {
+            resources.push(resource.create(row))
+        })
+        return new Response<T[]>(resources, parseInt(tot.rows[0].count), 200)
     }
 
     /**
      * @param values
      */
     async create(values: object): Promise<Response<T>> {
+        let q = createInsertSqlQuery(this.getName(), values)
+        let res = await pool.query(q.statement, q.values)
+        return new Response<T>(null, 1, 1)
+
+
         //TODO This is hardcoded for the sake of MVP. Needs rework!
-        let p = createStringOfPlaceholders(Object.keys(values).length)
-        let keys = Object.keys(values).toString()
-        let res = await pool.query(`INSERT INTO ${this.getName()}(value, profileid, date) VALUES ($1,$2,$3)`, [values['value'], values['profileid'], new Date().getTime()])
-        return new Response<T>(null, 1)
+        // let p = createStringOfPlaceholders(Object.keys(values).length)
+        // let keys = Object.keys(values).toString()
+        // let res = await pool.query(`INSERT INTO ${this.getName()}(value, profileid, date) VALUES ($1,$2,$3)`, [values['value'], values['profileid'], new Date().getTime()])
+        // return new Response<T>(null, 1, 1)
     }
 
     update(id: string, updatedInstance: T): T {

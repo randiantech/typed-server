@@ -2,7 +2,7 @@ import Profile from '../resource/Profile'
 import PostgreRepository from '../lib/db/postgre/PostgreRepository'
 import Method from '../lib/constant/Method'
 import route from '../lib/annotation/route'
-import HalHandler from '../lib/hal/HalHandler'
+import RequestPreProcessor from '../lib/hal/RequestPreProcessor'
 var __this;
 
 export default class ProfileService extends PostgreRepository<Profile> {
@@ -18,6 +18,6 @@ export default class ProfileService extends PostgreRepository<Profile> {
 
     @route(Method.GET, ['/profile/:id', '/profile'])
     async getProfile(req, res, next) {
-        HalHandler.search(__this, req, res, Profile)
+        RequestPreProcessor.search(__this, req, res, Profile)
     }
 }

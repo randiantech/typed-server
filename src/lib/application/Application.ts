@@ -17,39 +17,14 @@ const app = express()
  */
 export default class Application {
 
-    /**
-     * Default Application Port to be used in case specific value is not provided
-     */
     public static DEFAULT_PORT = 3000
-
-    /**
-     * Default page number to be used in case specific page value is not provided
-     */
     public static DEFAULT_PAGE = 1
-
-    /**
-     * Default page size number to be used in case specific page size value is not provided
-     */
     public static DEFAULT_PAGE_SIZE = 50
-
-    /**
-     * API Version. Prefixed the application routes
-     */
     public static API_VERSION
-
-    /**
-     * API Host. Used to construct URL strings on resource representations
-     */
     public static HOST
 
-    /**
-     * List of services hosted by server
-     */
     services: any[]
 
-    /**
-     * 
-     */
     constructor(services: any[], port?: number, version?: number, host?: string) {
         version ? Application.API_VERSION = version : 'v1'
         host ? Application.HOST = host : ''

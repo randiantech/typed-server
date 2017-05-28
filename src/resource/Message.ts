@@ -16,7 +16,7 @@ export default class Message extends Resource<Message> {
     /**
      * The name of the resource. This field is particularly important to link the corresponding resource mapper
      */
-    public static RESOURCE_NAME: string = 'message';
+    public static RESOURCE_NAME: string = 'Message';
 
     private value: string;
     private date: number;

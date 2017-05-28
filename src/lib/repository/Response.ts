@@ -2,19 +2,26 @@ import Resource from '../resource/Resource'
 
 export default class Response<T> {
 
-    private resources: Resource<T>[]
-    private total: number 
-
-    constructor(resources, total){
+    /**
+     * Constructor
+     * @param resources collection of resources
+     * @param status HTTP status code
+     */
+    constructor(private resources: Resource<T>[], private total: number, private status: number) {
         this.resources = resources
+        this.status = status
         this.total = total
     }
 
-    getResources(): Resource<T>[]{
+    getResources(): Resource<T>[] {
         return this.resources
     }
 
-    getTotal(): any {
+    getStatus(): number {
+        return this.status
+    }
+
+    getTotal(): number {
         return this.total
     }
 }

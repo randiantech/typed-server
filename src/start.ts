@@ -20,13 +20,11 @@ const port = process.env.APP_PORT
 const apiVersion = 2
 const host = `http://localhost:3000/`
 
-
 MapperProvider.add(Message.name, MessageMapper)
 MapperProvider.add(Trending.name, TrendingMapper)
 MapperProvider.add(MessageSocialInfo.name, MessageSocialInfoMapper)
 MapperProvider.add(PersonalInfo.name, PersonalInfoMapper)
 MapperProvider.add(Profile.name, ProfileMapper)
-
 
 new Application(
     [new ProfileService(), new MessageService(), new TrendingService()],

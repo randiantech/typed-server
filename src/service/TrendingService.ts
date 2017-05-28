@@ -2,7 +2,7 @@ import Trending from '../resource/Trending'
 import PostgreRepository from '../lib/db/postgre/PostgreRepository'
 import Method from '../lib/constant/Method'
 import route from '../lib/annotation/route'
-import HalHandler from '../lib/hal/HalHandler'
+import RequestPreProcessor from '../lib/hal/RequestPreProcessor'
 var __this;
 
 export default class TrendingService extends PostgreRepository<Trending> {
@@ -18,6 +18,6 @@ export default class TrendingService extends PostgreRepository<Trending> {
 
     @route(Method.GET, ['/trending/:id', '/trending'])
     async getTrendings(req, res, next) {
-        HalHandler.search(__this, req, res, Trending)
+        RequestPreProcessor.search(__this, req, res, Trending)
     }
 }

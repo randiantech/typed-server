@@ -1,7 +1,7 @@
 import { injectIdParams, toQueryString, removeDuplicatedSlashes } from '../utils/utils'
 import Application from '../application/Application'
 
-export default class HalHandler {
+export default class RequestPreProcessor {
 
     /**
      * Given a list of HAL resources, creates a HAL collection of them
@@ -38,16 +38,16 @@ export default class HalHandler {
     static async search(service, req, res, resource) {
         injectIdParams(req)
         try {
-            let response = await service.searchByRequest(req, resource)
+            let response = await service.searchByRequest(req, resource, true)
             if (req.params.id) {
                 let r = await response.getResources()[0].toHal(true)
                 res.send(r)
             } else {
-                let halCollection = await HalHandler.toHalCollection(response.getResources(), response.getTotal(), req)
+                let halCollection = await RequestPreProcessor.toHalCollection(response.getResources(), response.getTotal(), req)
                 res.send(halCollection)
             }
         } catch (err) {
-            res.send(err.toHal())
+            res.send(err)
         }
     }
 }

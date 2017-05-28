@@ -2,7 +2,7 @@ import Message from '../resource/Message'
 import PostgreRepository from '../lib/db/postgre/PostgreRepository'
 import Method from '../lib/constant/Method'
 import route from '../lib/annotation/route'
-import HalHandler from '../lib/hal/HalHandler'
+import RequestPreProcessor from '../lib/hal/RequestPreProcessor'
 var __this;
 
 /**
@@ -34,11 +34,12 @@ export default class MessageService extends PostgreRepository<Message> {
      */
     @route(Method.GET, ['/profile/:profileId/message', '/profile/:profileId/message/:id', '/message'])
     async searchForMessages(req, res, next) {
-        HalHandler.search(__this, req, res, Message)
+        RequestPreProcessor.search(__this, req, res, Message)
     }
 
     @route(Method.POST, '/message')
     async createMessage(req, res, next) {
+        req.body['date'] = new Date().getTime()
         let response = await __this.create(req.body)
         res.send('created')
     }

@@ -23,7 +23,7 @@ export default class MapperProvider {
      * @param resourceName the name of the resource
      * @param fieldName the field name. It can be dot separated one, in example: personalInfo.name
      */
-    static get(resourceName, fieldName) {
+    static get(resourceName, fieldName): { type: String, name: String } {
         let targetResource
         let mapper = mappers[resourceName]
 

@@ -16,7 +16,7 @@ interface Repository<T> {
     /**
      * Returns a collection of resources filtered by a provided HTTP request
      */
-    searchByRequest(request:any, resource): Promise<Response<T[]>>
+    searchByRequest(request: any, resource): Promise<Response<T[]>>
 
     /**
      * Creates a resource instance

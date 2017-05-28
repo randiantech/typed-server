@@ -17,7 +17,7 @@ export default class Profile extends Resource<Profile> {
     /**
      * @type {string} the name of the resource
      */
-    public static RESOURCE_NAME: string = 'profile';
+    public static RESOURCE_NAME: string = 'Profile';
 
 
     private personalInfo: PersonalInfo;
