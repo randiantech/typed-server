@@ -16,7 +16,7 @@ export default class RequestPreProcessor {
             _links: {
                 "total_results": total,
                 "page_size": parseInt(req.query['page_size']),
-                "total_pages": total / parseInt(req.query['page_size']) < 1 ? 1 : total / total / parseInt(req.query['page_size']),
+                "total_pages": total / parseInt(req.query['page_size']) < 1 ? 1 : total / parseInt(req.query['page_size']),
                 "current_page": removeDuplicatedSlashes(`${Application.HOST}/v${Application.API_VERSION}/${req.path}${toQueryString(req)}`)
             },
         }
